@@ -1,4 +1,5 @@
 ﻿using Library.Canvas.Models;
+using Library.Canvas.Services;
 
 namespace CLI.Canvas
 {
@@ -43,14 +44,9 @@ namespace CLI.Canvas
             while (inTeacherMenu)
             {
                 Console.WriteLine("\n=== Teacher Menu ===");
-                Console.WriteLine("1. Add a Course");
-                Console.WriteLine("2. Delete a Course");
-                Console.WriteLine("3. Update Course Description");
-                Console.WriteLine("4. Add an Assignment");
-                Console.WriteLine("5. Delete an Assignment");
-                Console.WriteLine("6. Edit an Assignment");
-                Console.WriteLine("7. Add a Module");
-                Console.WriteLine("8. Back to Main Menu");
+                Console.WriteLine("1. Add a new course");
+                Console.WriteLine("2. Select an existing course");
+                Console.WriteLine("3. Back to Main Menu");
                 Console.Write("\nEnter your choice: ");
 
                 var selection = Console.ReadLine();
@@ -58,33 +54,67 @@ namespace CLI.Canvas
                 switch (selection)
                 {
                     case "1":
-                        Console.WriteLine("Adding a course...");
+                        AddCourse();
                         break;
                     case "2":
-                        Console.WriteLine("Deleting a course...");
+                        SelectCourse();
                         break;
                     case "3":
-                        Console.WriteLine("Updating course description...");
-                        break;
-                    case "4":
-                        Console.WriteLine("Adding an assignment...");
-                        break;
-                    case "5":
-                        Console.WriteLine("Deleting an assignment...");
-                        break;
-                    case "6":
-                        Console.WriteLine("Editing an assignment...");
-                        break;
-                    case "7":
-                        Console.WriteLine("Adding a module...");
-                        break;
-                    case "8":
                         inTeacherMenu = false;
                         break;
                     default:
                         Console.WriteLine("Invalid choice. Please try again.");
                         break;
                 }
+            }
+        }
+
+        static void AddCourse()
+        {
+            Console.Write("Enter course name: ");
+            var name = Console.ReadLine();
+            Console.Write("Enter course code: ");
+            var code = Console.ReadLine();
+            Console.Write("Enter course description: ");
+            var description = Console.ReadLine();
+
+            var course = new Course
+            {
+                Name = name,
+                Code = code,
+                Description = description
+            };
+
+            CourseServiceProxy.Current.Add(course);
+            Console.WriteLine($"\nCourse '{name}' added with ID {course.Id}!");
+        }
+
+        static void SelectCourse()
+        {
+            var courses = CourseServiceProxy.Current.Courses;
+            if (courses.Count == 0)
+            {
+                Console.WriteLine("No courses available.");
+                return;
+            }
+
+            Console.WriteLine("\n=== Available Courses ===");
+            courses.ForEach(c => Console.WriteLine($"[{c.Id}] {c.Code} - {c.Name}"));
+
+            Console.Write("\nEnter course ID: ");
+            var input = Console.ReadLine();
+
+            if (int.TryParse(input, out int id))
+            {
+                var course = courses.FirstOrDefault(c => c.Id == id);
+                if (course != null)
+                    Console.WriteLine($"\nSelected: {course.Name} - {course.Description}");
+                else
+                    Console.WriteLine("No course found with that ID.");
+            }
+            else
+            {
+                Console.WriteLine("Invalid ID entered.");
             }
         }
     }
