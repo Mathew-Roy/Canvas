@@ -108,7 +108,7 @@ namespace CLI.Canvas
             {
                 var course = courses.FirstOrDefault(c => c.Id == id);
                 if (course != null)
-                    Console.WriteLine($"\nSelected: {course.Name} - {course.Description}");
+                    CourseMenu(course);
                 else
                     Console.WriteLine("No course found with that ID.");
             }
@@ -116,6 +116,182 @@ namespace CLI.Canvas
             {
                 Console.WriteLine("Invalid ID entered.");
             }
+        }
+
+        static void CourseMenu(Course course)
+        {
+            bool inCourseMenu = true;
+            while (inCourseMenu)
+            {
+                Console.WriteLine($"\n=== {course.Name} ({course.Code}) ===");
+                Console.WriteLine("1. View Assignments");
+                Console.WriteLine("2. Add an Assignment");
+                Console.WriteLine("3. Delete an Assignment");
+                Console.WriteLine("4. Edit an Assignment");
+                Console.WriteLine("5. View Modules");
+                Console.WriteLine("6. Add a Module");
+                Console.WriteLine("7. View Roster");
+                Console.WriteLine("8. Delete this Course");
+                Console.WriteLine("9. Update Course Description");
+                Console.WriteLine("10. Back to Teacher Menu");
+                Console.Write("\nEnter your choice: ");
+
+                var selection = Console.ReadLine();
+
+                switch (selection)
+                {
+                    case "1":
+                        Console.WriteLine("\n=== Assignments ===");
+                        if (course.Assignments.Count == 0)
+                            Console.WriteLine("No assignments yet.");
+                        else
+                            course.Assignments.ForEach(a => Console.WriteLine($"[{a.Id}] {a.Name} - {a.AvailablePoints} pts - Due: {a.DueDate:MM/dd/yyyy}"));
+                        break;
+                    case "2":
+                        AddAssignment(course);
+                        break;
+                    case "3":
+                        DeleteAssignment(course);
+                        break;
+                    case "4":
+                        EditAssignment(course);
+                        break;
+                    case "5":
+                        Console.WriteLine("\n=== Modules ===");
+                        if (course.Modules.Count == 0)
+                            Console.WriteLine("No modules yet.");
+                        else
+                            course.Modules.ForEach(m => Console.WriteLine($"[{m.Id}] Module with {m.Content.Count} item(s)"));
+                        break;
+                    case "6":
+                        AddModule(course);
+                        break;
+                    case "7":
+                        Console.WriteLine("\n=== Roster ===");
+                        if (course.Roster.Count == 0)
+                            Console.WriteLine("No students enrolled.");
+                        else
+                            course.Roster.ForEach(s => Console.WriteLine($"[{s.Id}] {s.Name} - {s.Classification}"));
+                        break;
+                    case "8":
+                        CourseServiceProxy.Current.Delete(course.Id);
+                        Console.WriteLine($"Course '{course.Name}' deleted.");
+                        inCourseMenu = false;
+                        break;
+                    case "9":
+                        Console.Write("Enter new description: ");
+                        course.Description = Console.ReadLine();
+                        Console.WriteLine("Description updated!");
+                        break;
+                    case "10":
+                        inCourseMenu = false;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        }
+
+        static void AddAssignment(Course course)
+        {
+            Console.Write("Enter assignment name: ");
+            var name = Console.ReadLine();
+            Console.Write("Enter description: ");
+            var description = Console.ReadLine();
+            Console.Write("Enter available points: ");
+            int.TryParse(Console.ReadLine(), out int points);
+            Console.Write("Enter due date (MM/DD/YYYY): ");
+            DateTime.TryParse(Console.ReadLine(), out DateTime dueDate);
+
+            var assignment = new Assignment
+            {
+                Id = course.Assignments.Count + 1,
+                Name = name,
+                Description = description,
+                AvailablePoints = points,
+                DueDate = dueDate
+            };
+
+            course.Assignments.Add(assignment);
+            Console.WriteLine($"Assignment '{name}' added!");
+        }
+
+        static void DeleteAssignment(Course course)
+        {
+            if (course.Assignments.Count == 0)
+            {
+                Console.WriteLine("No assignments to delete.");
+                return;
+            }
+
+            course.Assignments.ForEach(a => Console.WriteLine($"[{a.Id}] {a.Name}"));
+            Console.Write("Enter assignment ID to delete: ");
+            if (int.TryParse(Console.ReadLine(), out int id))
+            {
+                var assignment = course.Assignments.FirstOrDefault(a => a.Id == id);
+                if (assignment != null)
+                {
+                    course.Assignments.Remove(assignment);
+                    Console.WriteLine("Assignment deleted!");
+                }
+                else
+                    Console.WriteLine("Assignment not found.");
+            }
+        }
+
+        static void EditAssignment(Course course)
+        {
+            if (course.Assignments.Count == 0)
+            {
+                Console.WriteLine("No assignments to edit.");
+                return;
+            }
+
+            course.Assignments.ForEach(a => Console.WriteLine($"[{a.Id}] {a.Name}"));
+            Console.Write("Enter assignment ID to edit: ");
+            if (int.TryParse(Console.ReadLine(), out int id))
+            {
+                var assignment = course.Assignments.FirstOrDefault(a => a.Id == id);
+                if (assignment != null)
+                {
+                    Console.Write("Enter new name (or press Enter to keep current): ");
+                    var name = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(name)) assignment.Name = name;
+
+                    Console.Write("Enter new description (or press Enter to keep current): ");
+                    var desc = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(desc)) assignment.Description = desc;
+
+                    Console.Write("Enter new points (or press Enter to keep current): ");
+                    var pts = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(pts))
+                    {
+                        if (int.TryParse(pts, out int newPoints))
+                            assignment.AvailablePoints = newPoints;
+                    }
+
+                    Console.WriteLine("Assignment updated!");
+                }
+                else
+                    Console.WriteLine("Assignment not found.");
+            }
+        }
+
+        static void AddModule(Course course)
+        {
+            var module = new Module
+            {
+                Id = course.Modules.Count + 1
+            };
+
+            Console.Write("Enter module content (or press Enter to leave empty): ");
+            var content = Console.ReadLine();
+            if (!string.IsNullOrEmpty(content))
+                module.Content.Add(content);
+
+            course.Modules.Add(module);
+            Console.WriteLine($"Module added with ID {module.Id}!");
         }
     }
 }
