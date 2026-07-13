@@ -134,7 +134,8 @@ namespace CLI.Canvas
                 Console.WriteLine("8. Delete this Course");
                 Console.WriteLine("9. Update Course Description");
                 Console.WriteLine("10. Remove Content from a Module");
-                Console.WriteLine("11. Back to Teacher Menu");
+                Console.WriteLine("11. Modify Content in a Module");
+                Console.WriteLine("12. Back to Teacher Menu");
                 Console.Write("\nEnter your choice: ");
 
                 var selection = Console.ReadLine();
@@ -188,6 +189,9 @@ namespace CLI.Canvas
                         RemoveModuleContent(course);
                         break;
                     case "11":
+                        ModifyModuleContent(course);
+                        break;
+                    case "12":
                         inCourseMenu = false;
                         break;
                     default:
@@ -340,5 +344,54 @@ namespace CLI.Canvas
                 }
             }
         }
+        static void ModifyModuleContent(Course course)
+        {
+            if (course.Modules.Count == 0)
+            {
+                Console.WriteLine("No modules available.");
+                return;
+            }
+
+            course.Modules.ForEach(m => Console.WriteLine($"[{m.Id}] Module with {m.Content.Count} item(s)"));
+            Console.Write("Enter module ID: ");
+            if (int.TryParse(Console.ReadLine(), out int moduleId))
+            {
+                var module = course.Modules.FirstOrDefault(m => m.Id == moduleId);
+                if (module == null)
+                {
+                    Console.WriteLine("Module not found.");
+                    return;
+                }
+
+                if (module.Content.Count == 0)
+                {
+                    Console.WriteLine("No content in this module.");
+                    return;
+                }
+
+                for (int i = 0; i < module.Content.Count; i++)
+                    Console.WriteLine($"[{i}] {module.Content[i]}");
+
+                Console.Write("Enter content index to modify: ");
+                if (int.TryParse(Console.ReadLine(), out int index))
+                {
+                    if (index >= 0 && index < module.Content.Count)
+                    {
+                        Console.Write("Enter new content: ");
+                        var newContent = Console.ReadLine();
+                        if (!string.IsNullOrEmpty(newContent))
+                        {
+                            module.Content[index] = newContent;
+                            Console.WriteLine("Content updated!");
+                        }
+                        else
+                            Console.WriteLine("Content cannot be empty.");
+                    }
+                    else
+                        Console.WriteLine("Invalid index.");
+                }
+            }
+        }
     }
+    
 }
