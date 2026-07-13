@@ -22,7 +22,7 @@ namespace CLI.Canvas
                 switch (selection)
                 {
                     case "1":
-                        Console.WriteLine("\nYou are logged in as a Student.");
+                        SelectStudentProxy();
                         break;
                     case "2":
                         TeacherMenu();
@@ -389,6 +389,69 @@ namespace CLI.Canvas
                     }
                     else
                         Console.WriteLine("Invalid index.");
+                }
+            }
+        }
+        static void SelectStudentProxy()
+        {
+            var students = StudentServiceProxy.Current.Students;
+            if (students.Count == 0)
+            {
+                Console.WriteLine("No students available.");
+                return;
+            }
+
+            Console.WriteLine("\n=== Select Student ===");
+            students.ForEach(s => Console.WriteLine($"[{s.Id}] {s.Name} - {s.Classification} ({s.Code})"));
+
+            Console.Write("\nEnter student ID to proxy as: ");
+            var input = Console.ReadLine();
+
+            if (int.TryParse(input, out int id))
+            {
+                var student = students.FirstOrDefault(s => s.Id == id);
+                if (student != null)
+                {
+                    Console.WriteLine($"\nLogged in as {student.Name} ({student.Classification})");
+                    StudentMenu(student);
+                }
+                else
+                    Console.WriteLine("No student found with that ID.");
+            }
+            else
+                Console.WriteLine("Invalid ID entered.");
+        }
+
+        static void StudentMenu(Student student)
+        {
+            bool inStudentMenu = true;
+            while (inStudentMenu)
+            {
+                Console.WriteLine($"\n=== Student Menu - {student.Name} ===");
+                Console.WriteLine("1. View My Courses");
+                Console.WriteLine("2. Back to Main Menu");
+                Console.Write("\nEnter your choice: ");
+
+                var selection = Console.ReadLine();
+
+                switch (selection)
+                {
+                    case "1":
+                        Console.WriteLine("\n=== Your Courses ===");
+                        var courses = CourseServiceProxy.Current.Courses
+                            .Where(c => c.Roster.Any(s => s.Id == student.Id))
+                            .ToList();
+                        if (courses.Count == 0)
+                            Console.WriteLine("You are not enrolled in any courses.");
+                        else
+                            courses.ForEach(c => Console.WriteLine($"[{c.Id}] {c.Code} - {c.Name}"));
+                        break;
+                    case "2":
+                        inStudentMenu = false;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
                 }
             }
         }
