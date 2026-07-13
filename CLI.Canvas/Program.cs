@@ -443,7 +443,8 @@ namespace CLI.Canvas
                 Console.WriteLine("1. View My Courses");
                 Console.WriteLine("2. Submit an Assignment");
                 Console.WriteLine("3. View My Submissions");
-                Console.WriteLine("4. Back to Main Menu");
+                Console.WriteLine("4. Unenroll from a Course");
+                Console.WriteLine("5. Back to Main Menu");
                 Console.Write("\nEnter your choice: ");
 
                 var selection = Console.ReadLine();
@@ -467,6 +468,9 @@ namespace CLI.Canvas
                         ViewSubmissions(student);
                         break;
                     case "4":
+                        StudentUnenroll(student);
+                        break;
+                    case "5":
                         inStudentMenu = false;
                         break;
                     default:
@@ -668,6 +672,37 @@ namespace CLI.Canvas
                         Console.WriteLine($"Submission graded {grade}/{assignment.AvailablePoints}!");
                     }
                 }
+            }
+        }
+        static void StudentUnenroll(Student student)
+        {
+            var courses = CourseServiceProxy.Current.Courses
+                .Where(c => c.Roster.Any(s => s.Id == student.Id))
+                .ToList();
+
+            if (courses.Count == 0)
+            {
+                Console.WriteLine("You are not enrolled in any courses.");
+                return;
+            }
+
+            courses.ForEach(c => Console.WriteLine($"[{c.Id}] {c.Code} - {c.Name}"));
+            Console.Write("Enter course ID to unenroll from: ");
+
+            if (int.TryParse(Console.ReadLine(), out int courseId))
+            {
+                var course = courses.FirstOrDefault(c => c.Id == courseId);
+                if (course != null)
+                {
+                    var studentInRoster = course.Roster.FirstOrDefault(s => s.Id == student.Id);
+                    if (studentInRoster != null)
+                    {
+                        course.Roster.Remove(studentInRoster);
+                        Console.WriteLine($"You have been unenrolled from {course.Name}.");
+                    }
+                }
+                else
+                    Console.WriteLine("Course not found.");
             }
         }
     }
