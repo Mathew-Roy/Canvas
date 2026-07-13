@@ -135,7 +135,10 @@ namespace CLI.Canvas
                 Console.WriteLine("9. Update Course Description");
                 Console.WriteLine("10. Remove Content from a Module");
                 Console.WriteLine("11. Modify Content in a Module");
-                Console.WriteLine("12. Back to Teacher Menu");
+                Console.WriteLine("12. Enroll a Student");
+                Console.WriteLine("13. Unenroll a Student");
+                Console.WriteLine("14. Grade a Submission");
+                Console.WriteLine("15. Back to Teacher Menu");
                 Console.Write("\nEnter your choice: ");
 
                 var selection = Console.ReadLine();
@@ -192,6 +195,15 @@ namespace CLI.Canvas
                         ModifyModuleContent(course);
                         break;
                     case "12":
+                        EnrollStudent(course);
+                        break;
+                    case "13":
+                        UnenrollStudent(course);
+                        break;
+                    case "14":
+                        GradeSubmission(course);
+                        break;
+                    case "15":
                         inCourseMenu = false;
                         break;
                     default:
@@ -429,7 +441,9 @@ namespace CLI.Canvas
             {
                 Console.WriteLine($"\n=== Student Menu - {student.Name} ===");
                 Console.WriteLine("1. View My Courses");
-                Console.WriteLine("2. Back to Main Menu");
+                Console.WriteLine("2. Submit an Assignment");
+                Console.WriteLine("3. View My Submissions");
+                Console.WriteLine("4. Back to Main Menu");
                 Console.Write("\nEnter your choice: ");
 
                 var selection = Console.ReadLine();
@@ -447,11 +461,212 @@ namespace CLI.Canvas
                             courses.ForEach(c => Console.WriteLine($"[{c.Id}] {c.Code} - {c.Name}"));
                         break;
                     case "2":
+                        SubmitAssignment(student);
+                        break;
+                    case "3":
+                        ViewSubmissions(student);
+                        break;
+                    case "4":
                         inStudentMenu = false;
                         break;
                     default:
                         Console.WriteLine("Invalid choice. Please try again.");
                         break;
+                }
+            }
+        }
+
+        static void SubmitAssignment(Student student)
+        {
+            var courses = CourseServiceProxy.Current.Courses
+                .Where(c => c.Roster.Any(s => s.Id == student.Id))
+                .ToList();
+
+            if (courses.Count == 0)
+            {
+                Console.WriteLine("You are not enrolled in any courses.");
+                return;
+            }
+
+            Console.WriteLine("\n=== Your Courses ===");
+            courses.ForEach(c => Console.WriteLine($"[{c.Id}] {c.Code} - {c.Name}"));
+            Console.Write("Enter course ID: ");
+
+            if (int.TryParse(Console.ReadLine(), out int courseId))
+            {
+                var course = courses.FirstOrDefault(c => c.Id == courseId);
+                if (course == null)
+                {
+                    Console.WriteLine("Course not found.");
+                    return;
+                }
+
+                if (course.Assignments.Count == 0)
+                {
+                    Console.WriteLine("No assignments in this course.");
+                    return;
+                }
+
+                Console.WriteLine("\n=== Assignments ===");
+                course.Assignments.ForEach(a => Console.WriteLine($"[{a.Id}] {a.Name} - Due: {a.DueDate:MM/dd/yyyy}"));
+                Console.Write("Enter assignment ID: ");
+
+                if (int.TryParse(Console.ReadLine(), out int assignmentId))
+                {
+                    var assignment = course.Assignments.FirstOrDefault(a => a.Id == assignmentId);
+                    if (assignment == null)
+                    {
+                        Console.WriteLine("Assignment not found.");
+                        return;
+                    }
+
+                    Console.Write("Enter your submission content: ");
+                    var content = Console.ReadLine();
+
+                    var submission = new Submission
+                    {
+                        Id = assignment.Submissions.Count + 1,
+                        StudentId = student.Id,
+                        AssignmentId = assignment.Id,
+                        Content = content,
+                        SubmissionDate = DateTime.Now
+                    };
+
+                    assignment.Submissions.Add(submission);
+                    Console.WriteLine("Submission submitted successfully!");
+                }
+            }
+        }
+
+        static void ViewSubmissions(Student student)
+        {
+            var courses = CourseServiceProxy.Current.Courses
+                .Where(c => c.Roster.Any(s => s.Id == student.Id))
+                .ToList();
+
+            bool found = false;
+            foreach (var course in courses)
+            {
+                foreach (var assignment in course.Assignments)
+                {
+                    var mySubmissions = assignment.Submissions
+                        .Where(s => s.StudentId == student.Id)
+                        .ToList();
+
+                    if (mySubmissions.Count > 0)
+                    {
+                        found = true;
+                        Console.WriteLine($"\n{course.Name} - {assignment.Name}:");
+                        mySubmissions.ForEach(s => Console.WriteLine($"  Submitted: {s.SubmissionDate:MM/dd/yyyy} - {s.Content}"));
+                    }
+                }
+            }
+
+            if (!found)
+                Console.WriteLine("You have no submissions yet.");
+        }
+        static void EnrollStudent(Course course)
+        {
+            var students = StudentServiceProxy.Current.Students;
+            if (students.Count == 0)
+            {
+                Console.WriteLine("No students available.");
+                return;
+            }
+
+            Console.WriteLine("\n=== Available Students ===");
+            students.ForEach(s => Console.WriteLine($"[{s.Id}] {s.Name} - {s.Classification}"));
+
+            Console.Write("Enter student ID to enroll: ");
+            if (int.TryParse(Console.ReadLine(), out int id))
+            {
+                var student = students.FirstOrDefault(s => s.Id == id);
+                if (student == null)
+                {
+                    Console.WriteLine("Student not found.");
+                    return;
+                }
+                if (course.Roster.Any(s => s.Id == id))
+                {
+                    Console.WriteLine("Student is already enrolled.");
+                    return;
+                }
+                course.Roster.Add(student);
+                Console.WriteLine($"{student.Name} enrolled successfully!");
+            }
+            else
+                Console.WriteLine("Invalid ID.");
+        }
+
+        static void UnenrollStudent(Course course)
+        {
+            if (course.Roster.Count == 0)
+            {
+                Console.WriteLine("No students enrolled.");
+                return;
+            }
+
+            Console.WriteLine("\n=== Enrolled Students ===");
+            course.Roster.ForEach(s => Console.WriteLine($"[{s.Id}] {s.Name} - {s.Classification}"));
+
+            Console.Write("Enter student ID to unenroll: ");
+            if (int.TryParse(Console.ReadLine(), out int id))
+            {
+                var student = course.Roster.FirstOrDefault(s => s.Id == id);
+                if (student != null)
+                {
+                    course.Roster.Remove(student);
+                    Console.WriteLine($"{student.Name} unenrolled successfully!");
+                }
+                else
+                    Console.WriteLine("Student not found in roster.");
+            }
+            else
+                Console.WriteLine("Invalid ID.");
+        }
+        static void GradeSubmission(Course course)
+        {
+            if (course.Assignments.Count == 0)
+            {
+                Console.WriteLine("No assignments in this course.");
+                return;
+            }
+
+            course.Assignments.ForEach(a => Console.WriteLine($"[{a.Id}] {a.Name} - {a.Submissions.Count} submission(s)"));
+            Console.Write("Enter assignment ID to grade: ");
+
+            if (int.TryParse(Console.ReadLine(), out int assignmentId))
+            {
+                var assignment = course.Assignments.FirstOrDefault(a => a.Id == assignmentId);
+                if (assignment == null)
+                {
+                    Console.WriteLine("Assignment not found.");
+                    return;
+                }
+
+                if (assignment.Submissions.Count == 0)
+                {
+                    Console.WriteLine("No submissions for this assignment.");
+                    return;
+                }
+
+                assignment.Submissions.ForEach(s => Console.WriteLine($"[{s.Id}] Student {s.StudentId} - {s.Content}"));
+                Console.Write("Enter submission ID to grade: ");
+
+                if (int.TryParse(Console.ReadLine(), out int submissionId))
+                {
+                    var submission = assignment.Submissions.FirstOrDefault(s => s.Id == submissionId);
+                    if (submission == null)
+                    {
+                        Console.WriteLine("Submission not found.");
+                        return;
+                    }
+
+                    Console.Write($"Enter grade (0-{assignment.AvailablePoints}): ");
+                    if (int.TryParse(Console.ReadLine(), out int grade))
+                    {
+                        Console.WriteLine($"Submission graded {grade}/{assignment.AvailablePoints}!");
+                    }
                 }
             }
         }
