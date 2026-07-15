@@ -452,14 +452,7 @@ namespace CLI.Canvas
                 switch (selection)
                 {
                     case "1":
-                        Console.WriteLine("\n=== Your Courses ===");
-                        var courses = CourseServiceProxy.Current.Courses
-                            .Where(c => c.Roster.Any(s => s.Id == student.Id))
-                            .ToList();
-                        if (courses.Count == 0)
-                            Console.WriteLine("You are not enrolled in any courses.");
-                        else
-                            courses.ForEach(c => Console.WriteLine($"[{c.Id}] {c.Code} - {c.Name}"));
+                        ViewStudentCourses(student);
                         break;
                     case "2":
                         SubmitAssignment(student);
@@ -703,6 +696,101 @@ namespace CLI.Canvas
                 }
                 else
                     Console.WriteLine("Course not found.");
+            }
+        }
+        static void ViewStudentCourses(Student student)
+        {
+            var courses = CourseServiceProxy.Current.Courses
+                .Where(c => c.Roster.Any(s => s.Id == student.Id))
+                .ToList();
+
+            if (courses.Count == 0)
+            {
+                Console.WriteLine("You are not enrolled in any courses.");
+                return;
+            }
+
+            Console.WriteLine("\n=== Your Courses ===");
+            courses.ForEach(c => Console.WriteLine($"[{c.Id}] {c.Code} - {c.Name}"));
+
+            Console.Write("\nEnter course ID to view details (or 0 to go back): ");
+            if (int.TryParse(Console.ReadLine(), out int courseId) && courseId != 0)
+            {
+                var course = courses.FirstOrDefault(c => c.Id == courseId);
+                if (course != null)
+                    StudentCourseView(student, course);
+                else
+                    Console.WriteLine("Course not found.");
+            }
+        }
+
+        static void StudentCourseView(Student student, Course course)
+        {
+            bool inCourseView = true;
+            while (inCourseView)
+            {
+                Console.WriteLine($"\n=== {course.Name} ({course.Code}) ===");
+                Console.WriteLine("1. View Assignments");
+                Console.WriteLine("2. View Course Schedule");
+                Console.WriteLine("3. View Modules");
+                Console.WriteLine("4. View Other Students");
+                Console.WriteLine("5. Back to My Courses");
+                Console.Write("\nEnter your choice: ");
+
+                var selection = Console.ReadLine();
+
+                switch (selection)
+                {
+                    case "1":
+                        Console.WriteLine("\n=== Assignments ===");
+                        if (course.Assignments.Count == 0)
+                            Console.WriteLine("No assignments yet.");
+                        else
+                            course.Assignments.ForEach(a => Console.WriteLine(
+                                $"[{a.Id}] {a.Name} - {a.AvailablePoints} pts - Due: {a.DueDate:MM/dd/yyyy}\n    {a.Description}"));
+                        break;
+                    case "2":
+                        Console.WriteLine("\n=== Course Schedule ===");
+                        if (course.Assignments.Count == 0)
+                            Console.WriteLine("No assignments scheduled.");
+                        else
+                        {
+                            var sorted = course.Assignments.OrderBy(a => a.DueDate).ToList();
+                            sorted.ForEach(a => Console.WriteLine(
+                                $"Due {a.DueDate:MM/dd/yyyy} - {a.Name} ({a.AvailablePoints} pts)"));
+                        }
+                        break;
+                    case "3":
+                        Console.WriteLine("\n=== Modules ===");
+                        if (course.Modules.Count == 0)
+                            Console.WriteLine("No modules yet.");
+                        else
+                        {
+                            foreach (var module in course.Modules)
+                            {
+                                Console.WriteLine($"\nModule {module.Id}:");
+                                if (module.Content.Count == 0)
+                                    Console.WriteLine("  No content yet.");
+                                else
+                                    module.Content.ForEach(c => Console.WriteLine($"  - {c}"));
+                            }
+                        }
+                        break;
+                    case "4":
+                        Console.WriteLine("\n=== Students in this Course ===");
+                        if (course.Roster.Count == 0)
+                            Console.WriteLine("No students enrolled.");
+                        else
+                            course.Roster.ForEach(s => Console.WriteLine(
+                                $"[{s.Id}] {s.Name} - {s.Classification}"));
+                        break;
+                    case "5":
+                        inCourseView = false;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
             }
         }
     }
