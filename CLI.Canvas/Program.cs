@@ -1130,9 +1130,9 @@ namespace CLI.Canvas
                 Console.WriteLine("2. View Course Schedule");
                 Console.WriteLine("3. View Modules");
                 Console.WriteLine("4. View Other Students");
-                Console.WriteLine("5. Back to My Courses");
+                Console.WriteLine("5. View My Grades");
+                Console.WriteLine("6. Back to My Courses");
                 Console.Write("\nEnter your choice: ");
-
                 var selection = Console.ReadLine();
 
                 switch (selection)
@@ -1181,6 +1181,9 @@ namespace CLI.Canvas
                                 $"[{s.Id}] {s.Name} - {s.Classification}"));
                         break;
                     case "5":
+                        ViewStudentGrades(student, course);
+                        break;
+                    case "6":
                         inCourseView = false;
                         break;
                     default:
@@ -1188,6 +1191,64 @@ namespace CLI.Canvas
                         break;
                 }
             }
+        }
+        static void ViewStudentGrades(Student student, Course course)
+        {
+            Console.WriteLine("\n=== My Grades ===");
+
+            if (course.Assignments.Count == 0)
+            {
+                Console.WriteLine("No assignments in this course.");
+                return;
+            }
+
+            // Per-assignment scores and feedback
+            foreach (var a in course.Assignments)
+            {
+                var sub = a.Submissions
+                    .FirstOrDefault(s => s.StudentId == student.Id && s.Grade.HasValue);
+
+                if (sub != null && a.AvailablePoints > 0)
+                {
+                    double pct = sub.Grade!.Value / a.AvailablePoints * 100.0;
+                    Console.WriteLine($"{a.Name}: {sub.Grade}/{a.AvailablePoints} ({pct:F1}%)");
+                    if (!string.IsNullOrWhiteSpace(sub.Feedback))
+                        Console.WriteLine($"   Feedback: {sub.Feedback}");
+                }
+                else
+                {
+                    Console.WriteLine($"{a.Name}: not graded");
+                }
+            }
+
+            // Weighted course average (same math as the teacher view, for this student)
+            if (course.AssignmentGroups.Count == 0)
+            {
+                Console.WriteLine("\nNo weighted groups set up for this course yet.");
+                return;
+            }
+
+            double courseGrade = 0;
+            foreach (var group in course.AssignmentGroups)
+            {
+                var groupAssignments = course.Assignments
+                    .Where(a => a.GroupId == group.Id)
+                    .ToList();
+
+                var percents = new List<double>();
+                foreach (var a in groupAssignments)
+                {
+                    var sub = a.Submissions
+                        .FirstOrDefault(s => s.StudentId == student.Id && s.Grade.HasValue);
+                    if (sub != null && a.AvailablePoints > 0)
+                        percents.Add(sub.Grade!.Value / a.AvailablePoints * 100.0);
+                }
+
+                if (percents.Count > 0)
+                    courseGrade += percents.Average() * (group.Weight / 100.0);
+            }
+
+            Console.WriteLine($"\nWeighted course grade: {courseGrade:F1}%");
         }
     }
     
