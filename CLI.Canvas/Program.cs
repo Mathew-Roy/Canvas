@@ -47,7 +47,8 @@ namespace CLI.Canvas
                 Console.WriteLine("1. Add a new course");
                 Console.WriteLine("2. Select an existing course");
                 Console.WriteLine("3. View courses by semester");
-                Console.WriteLine("4. Back to Main Menu");
+                Console.WriteLine("4. Copy a course");
+                Console.WriteLine("5. Back to Main Menu");
                 Console.Write("\nEnter your choice: ");
 
                 var selection = Console.ReadLine();
@@ -62,8 +63,11 @@ namespace CLI.Canvas
                         break;
                     case "3":
                         ViewCoursesBySemester();
-                    break;
+                        break;
                     case "4":
+                        CopyCourse();
+                        break;
+                    case "5":
                         inTeacherMenu = false;
                         break;
                     default:
@@ -1315,6 +1319,105 @@ namespace CLI.Canvas
                 }
                 else
                     Console.WriteLine("Invalid index.");
+            }
+        }
+        static void CopyCourse()
+        {
+            var courses = CourseServiceProxy.Current.Courses;
+            if (courses.Count == 0)
+            {
+                Console.WriteLine("No courses to copy.");
+                return;
+            }
+
+            courses.ForEach(c => Console.WriteLine($"[{c.Id}] {c.Code} - {c.Name} ({c.Semester}, Sec {c.Section})"));
+            Console.Write("Enter course ID to copy: ");
+            if (!int.TryParse(Console.ReadLine(), out int id))
+            {
+                Console.WriteLine("Invalid ID.");
+                return;
+            }
+
+            var source = courses.FirstOrDefault(c => c.Id == id);
+            if (source == null)
+            {
+                Console.WriteLine("Course not found.");
+                return;
+            }
+
+            // New course - roster intentionally NOT copied
+            var copy = new Course
+            {
+                Code = source.Code,
+                Name = source.Name + " (Copy)",
+                Description = source.Description,
+                Term = source.Term,
+                Year = source.Year,
+                Section = source.Section
+            };
+
+            // Deep-copy assignment groups (new objects, same intra-course IDs)
+            foreach (var g in source.AssignmentGroups)
+            {
+                copy.AssignmentGroups.Add(new AssignmentGroup
+                {
+                    Id = g.Id,
+                    Name = g.Name,
+                    Weight = g.Weight
+                });
+            }
+
+            // Deep-copy assignments - submissions intentionally NOT copied
+            foreach (var a in source.Assignments)
+            {
+                copy.Assignments.Add(new Assignment
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                    Description = a.Description,
+                    AvailablePoints = a.AvailablePoints,
+                    DueDate = a.DueDate,
+                    GroupId = a.GroupId
+                });
+            }
+
+            // Deep-copy modules and each content item
+            foreach (var m in source.Modules)
+            {
+                var newModule = new Module { Id = m.Id };
+                foreach (var item in m.Content)
+                    newModule.Content.Add(CopyModuleItem(item));
+                copy.Modules.Add(newModule);
+            }
+
+            CourseServiceProxy.Current.Add(copy);
+            Console.WriteLine($"\nCourse copied! New course '{copy.Name}' created with ID {copy.Id}.");
+            Console.WriteLine("(Roster and student submissions were not copied.)");
+        }
+
+        static ModuleItem CopyModuleItem(ModuleItem item)
+        {
+            switch (item)
+            {
+                case PageItem page:
+                    return new PageItem { Content = page.Content };
+                case FileItem file:
+                    return new FileItem { FileName = file.FileName, FilePath = file.FilePath };
+                case AssignmentItem ai:
+                    return new AssignmentItem
+                    {
+                        Assignment = new Assignment
+                        {
+                            Id = ai.Assignment.Id,
+                            Name = ai.Assignment.Name,
+                            Description = ai.Assignment.Description,
+                            AvailablePoints = ai.Assignment.AvailablePoints,
+                            DueDate = ai.Assignment.DueDate,
+                            GroupId = ai.Assignment.GroupId
+                        }
+                    };
+                default:
+                    return new PageItem { Content = "(unknown item)" };
             }
         }
     }
