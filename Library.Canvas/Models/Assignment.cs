@@ -7,6 +7,7 @@ namespace Library.Canvas.Models
         public string? Description { get; set; }
         public int AvailablePoints { get; set; }
         public DateTime DueDate { get; set; }
+        public int? GroupId { get; set; }
         public List<Submission> Submissions { get; set; } = new List<Submission>();
     }
 }
