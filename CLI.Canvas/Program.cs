@@ -184,7 +184,8 @@ namespace CLI.Canvas
                 Console.WriteLine("13. Unenroll a Student");
                 Console.WriteLine("14. Grade a Submission");
                 Console.WriteLine("15. Manage Assignment Groups");
-                Console.WriteLine("16. Back to Teacher Menu");
+                Console.WriteLine("16. View Course Grades");
+                Console.WriteLine("17. Back to Teacher Menu");
                 Console.Write("\nEnter your choice: ");
 
                 var selection = Console.ReadLine();
@@ -253,6 +254,9 @@ namespace CLI.Canvas
                         ManageAssignmentGroups(course);
                         break;
                     case "16":
+                        ViewCourseGrades(course);
+                        break;
+                    case "17":
                         inCourseMenu = false;
                         break;
                     default:
@@ -777,7 +781,8 @@ namespace CLI.Canvas
                 Console.WriteLine("3. Rename a group");
                 Console.WriteLine("4. Delete a group");
                 Console.WriteLine("5. Add an assignment to a group");
-                Console.WriteLine("6. Back to Course Menu");
+                Console.WriteLine("6. Set a group's weight");
+                Console.WriteLine("7. Back to Course Menu");
                 Console.Write("\nEnter your choice: ");
 
                 var selection = Console.ReadLine();
@@ -800,12 +805,104 @@ namespace CLI.Canvas
                         AddAssignmentToGroup(course);
                         break;
                     case "6":
+                        SetGroupWeight(course);
+                        break;
+                    case "7":
                         inGroupMenu = false;
                         break;
                     default:
                         Console.WriteLine("Invalid choice. Please try again.");
                         break;
                 }
+            }
+        }
+        static void SetGroupWeight(Course course)
+        {
+            if (course.AssignmentGroups.Count == 0)
+            {
+                Console.WriteLine("No groups yet. Add a group first.");
+                return;
+            }
+
+            course.AssignmentGroups.ForEach(g => Console.WriteLine($"[{g.Id}] {g.Name} (weight: {g.Weight}%)"));
+            Console.Write("Enter group ID to set weight: ");
+            if (!int.TryParse(Console.ReadLine(), out int id))
+            {
+                Console.WriteLine("Invalid ID.");
+                return;
+            }
+
+            var group = course.AssignmentGroups.FirstOrDefault(g => g.Id == id);
+            if (group == null)
+            {
+                Console.WriteLine("Group not found.");
+                return;
+            }
+
+            Console.Write("Enter weight as a percent (e.g. 40): ");
+            if (!double.TryParse(Console.ReadLine(), out double weight) || weight < 0)
+            {
+                Console.WriteLine("Invalid weight.");
+                return;
+            }
+
+            group.Weight = weight;
+            Console.WriteLine($"'{group.Name}' weight set to {weight}%.");
+
+            double totalWeight = course.AssignmentGroups.Sum(g => g.Weight);
+            if (totalWeight != 100)
+                Console.WriteLine($"Note: group weights currently total {totalWeight}%.");
+        }
+
+        static void ViewCourseGrades(Course course)
+        {
+            if (course.Roster.Count == 0)
+            {
+                Console.WriteLine("No students enrolled.");
+                return;
+            }
+
+            if (course.AssignmentGroups.Count == 0)
+            {
+                Console.WriteLine("No assignment groups. Add groups and weights first.");
+                return;
+            }
+
+            Console.WriteLine("\n=== Course Grades (weighted) ===");
+            foreach (var student in course.Roster)
+            {
+                Console.WriteLine($"\n{student.Name}:");
+                double courseGrade = 0;
+
+                foreach (var group in course.AssignmentGroups)
+                {
+                    var groupAssignments = course.Assignments
+                        .Where(a => a.GroupId == group.Id)
+                        .ToList();
+
+                    var percents = new List<double>();
+                    foreach (var a in groupAssignments)
+                    {
+                        var sub = a.Submissions
+                            .FirstOrDefault(s => s.StudentId == student.Id && s.Grade.HasValue);
+                        if (sub != null && a.AvailablePoints > 0)
+                            percents.Add(sub.Grade!.Value / a.AvailablePoints * 100.0);
+                    }
+
+                    if (percents.Count > 0)
+                    {
+                        double groupAvg = percents.Average();
+                        double contribution = groupAvg * (group.Weight / 100.0);
+                        courseGrade += contribution;
+                        Console.WriteLine($"  {group.Name}: avg {groupAvg:F1}% x weight {group.Weight}% = {contribution:F1} pts");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"  {group.Name}: no graded work");
+                    }
+                }
+
+                Console.WriteLine($"  --> Course grade: {courseGrade:F1}%");
             }
         }
 
@@ -820,7 +917,7 @@ namespace CLI.Canvas
             Console.WriteLine("\n=== Groups ===");
             foreach (var group in course.AssignmentGroups)
             {
-                Console.WriteLine($"\n[{group.Id}] {group.Name}");
+                Console.WriteLine($"\n[{group.Id}] {group.Name} (weight: {group.Weight}%)");
                 var assignments = course.Assignments.Where(a => a.GroupId == group.Id).ToList();
                 if (assignments.Count == 0)
                     Console.WriteLine("  (no assignments)");
