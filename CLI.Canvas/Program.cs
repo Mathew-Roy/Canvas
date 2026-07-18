@@ -46,7 +46,8 @@ namespace CLI.Canvas
                 Console.WriteLine("\n=== Teacher Menu ===");
                 Console.WriteLine("1. Add a new course");
                 Console.WriteLine("2. Select an existing course");
-                Console.WriteLine("3. Back to Main Menu");
+                Console.WriteLine("3. View courses by semester");
+                Console.WriteLine("4. Back to Main Menu");
                 Console.Write("\nEnter your choice: ");
 
                 var selection = Console.ReadLine();
@@ -60,6 +61,9 @@ namespace CLI.Canvas
                         SelectCourse();
                         break;
                     case "3":
+                        ViewCoursesBySemester();
+                    break;
+                    case "4":
                         inTeacherMenu = false;
                         break;
                     default:
@@ -133,6 +137,29 @@ namespace CLI.Canvas
             else
             {
                 Console.WriteLine("Invalid ID entered.");
+            }
+        }
+
+        static void ViewCoursesBySemester()
+        {
+            var courses = CourseServiceProxy.Current.Courses;
+            if (courses.Count == 0)
+            {
+                Console.WriteLine("No courses available.");
+                return;
+            }
+
+            var grouped = courses
+                .OrderBy(c => c.Year)
+                .ThenBy(c => c.Term)
+                .GroupBy(c => c.Semester);
+
+            Console.WriteLine("\n=== Courses by Semester ===");
+            foreach (var group in grouped)
+            {
+                Console.WriteLine($"\n{group.Key}:");
+                foreach (var c in group)
+                    Console.WriteLine($"  [{c.Id}] {c.Code} - {c.Name} (Sec {c.Section})");
             }
         }
 
