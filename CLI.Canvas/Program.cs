@@ -681,40 +681,90 @@ namespace CLI.Canvas
             course.Assignments.ForEach(a => Console.WriteLine($"[{a.Id}] {a.Name} - {a.Submissions.Count} submission(s)"));
             Console.Write("Enter assignment ID to grade: ");
 
-            if (int.TryParse(Console.ReadLine(), out int assignmentId))
+            if (!int.TryParse(Console.ReadLine(), out int assignmentId))
             {
-                var assignment = course.Assignments.FirstOrDefault(a => a.Id == assignmentId);
-                if (assignment == null)
+                Console.WriteLine("Invalid ID.");
+                return;
+            }
+
+            var assignment = course.Assignments.FirstOrDefault(a => a.Id == assignmentId);
+            if (assignment == null)
+            {
+                Console.WriteLine("Assignment not found.");
+                return;
+            }
+
+            if (assignment.Submissions.Count == 0)
+            {
+                Console.WriteLine("No submissions for this assignment.");
+                return;
+            }
+
+            assignment.Submissions.ForEach(s =>
+            {
+                var status = s.Grade.HasValue
+                    ? $"graded {s.Grade}/{assignment.AvailablePoints}"
+                    : "not graded";
+                Console.WriteLine($"[{s.Id}] Student {s.StudentId} - {s.Content} ({status})");
+            });
+            Console.Write("Enter submission ID to grade: ");
+
+            if (!int.TryParse(Console.ReadLine(), out int submissionId))
+            {
+                Console.WriteLine("Invalid ID.");
+                return;
+            }
+
+            var submission = assignment.Submissions.FirstOrDefault(s => s.Id == submissionId);
+            if (submission == null)
+            {
+                Console.WriteLine("Submission not found.");
+                return;
+            }
+
+            // Choose how to enter the grade
+            Console.WriteLine("\nHow do you want to enter the grade?");
+            Console.WriteLine("1. Points (out of available)");
+            Console.WriteLine("2. Percentage");
+            Console.Write("Enter your choice: ");
+            var mode = Console.ReadLine();
+
+            double points;
+            if (mode == "2")
+            {
+                Console.Write("Enter percentage (0-100): ");
+                if (!double.TryParse(Console.ReadLine(), out double percent))
                 {
-                    Console.WriteLine("Assignment not found.");
+                    Console.WriteLine("Invalid number.");
                     return;
                 }
-
-                if (assignment.Submissions.Count == 0)
+                points = percent / 100.0 * assignment.AvailablePoints;
+            }
+            else
+            {
+                Console.Write($"Enter points (0-{assignment.AvailablePoints}): ");
+                if (!double.TryParse(Console.ReadLine(), out points))
                 {
-                    Console.WriteLine("No submissions for this assignment.");
+                    Console.WriteLine("Invalid number.");
                     return;
-                }
-
-                assignment.Submissions.ForEach(s => Console.WriteLine($"[{s.Id}] Student {s.StudentId} - {s.Content}"));
-                Console.Write("Enter submission ID to grade: ");
-
-                if (int.TryParse(Console.ReadLine(), out int submissionId))
-                {
-                    var submission = assignment.Submissions.FirstOrDefault(s => s.Id == submissionId);
-                    if (submission == null)
-                    {
-                        Console.WriteLine("Submission not found.");
-                        return;
-                    }
-
-                    Console.Write($"Enter grade (0-{assignment.AvailablePoints}): ");
-                    if (int.TryParse(Console.ReadLine(), out int grade))
-                    {
-                        Console.WriteLine($"Submission graded {grade}/{assignment.AvailablePoints}!");
-                    }
                 }
             }
+
+            if (points < 0 || points > assignment.AvailablePoints)
+            {
+                Console.WriteLine($"Grade must be between 0 and {assignment.AvailablePoints}.");
+                return;
+            }
+
+            submission.Grade = points;
+
+            Console.Write("Enter feedback (optional, press Enter to skip): ");
+            submission.Feedback = Console.ReadLine();
+
+            double pct = assignment.AvailablePoints > 0
+                ? points / assignment.AvailablePoints * 100.0
+                : 0;
+            Console.WriteLine($"Saved: {points}/{assignment.AvailablePoints} ({pct:F1}%)");
         }
         static void ManageAssignmentGroups(Course course)
         {
