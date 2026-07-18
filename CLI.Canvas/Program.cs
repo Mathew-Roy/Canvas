@@ -78,15 +78,33 @@ namespace CLI.Canvas
             Console.Write("Enter course description: ");
             var description = Console.ReadLine();
 
+            Term term;
+            while (true)
+            {
+                Console.Write("Enter term (Spring, Summer, Fall, Winter): ");
+                if (Enum.TryParse(Console.ReadLine(), true, out term))
+                    break;
+                Console.WriteLine("Invalid term. Try again.");
+            }
+
+            Console.Write("Enter year (e.g. 2026): ");
+            int.TryParse(Console.ReadLine(), out int year);
+
+            Console.Write("Enter section (e.g. 001): ");
+            var section = Console.ReadLine();
+
             var course = new Course
             {
                 Name = name,
                 Code = code,
-                Description = description
+                Description = description,
+                Term = term,
+                Year = year,
+                Section = section
             };
 
             CourseServiceProxy.Current.Add(course);
-            Console.WriteLine($"\nCourse '{name}' added with ID {course.Id}!");
+            Console.WriteLine($"\nCourse '{name}' ({course.Semester}, Section {course.Section}) added with ID {course.Id}!");
         }
 
         static void SelectCourse()
@@ -99,7 +117,7 @@ namespace CLI.Canvas
             }
 
             Console.WriteLine("\n=== Available Courses ===");
-            courses.ForEach(c => Console.WriteLine($"[{c.Id}] {c.Code} - {c.Name}"));
+            courses.ForEach(c => Console.WriteLine($"[{c.Id}] {c.Code} - {c.Name} ({c.Semester}, Sec {c.Section})"));
 
             Console.Write("\nEnter course ID: ");
             var input = Console.ReadLine();
@@ -123,7 +141,7 @@ namespace CLI.Canvas
             bool inCourseMenu = true;
             while (inCourseMenu)
             {
-                Console.WriteLine($"\n=== {course.Name} ({course.Code}) ===");
+                Console.WriteLine($"\n=== {course.Name} ({course.Code}) - {course.Semester}, Section {course.Section} ===");
                 Console.WriteLine("1. View Assignments");
                 Console.WriteLine("2. Add an Assignment");
                 Console.WriteLine("3. Delete an Assignment");

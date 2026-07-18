@@ -11,8 +11,8 @@ namespace Library.Canvas.Services
         {
             Courses = new List<Course>
             {
-                new Course { Id = 1, Code = "COP4870", Name = "Full Stack Development", Description = "Building full stack applications" },
-                new Course { Id = 2, Code = "COP3330", Name = "Object Oriented Programming", Description = "OOP concepts in C++" }
+                new Course { Id = 1, Code = "COP4870", Name = "Full Stack Development", Description = "Building full stack applications", Term = Term.Fall, Year = 2026, Section = "001" },
+                new Course { Id = 2, Code = "COP3330", Name = "Object Oriented Programming", Description = "OOP concepts in C++", Term = Term.Spring, Year = 2026, Section = "001" }
             };
         }
 
