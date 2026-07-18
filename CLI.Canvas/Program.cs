@@ -209,11 +209,7 @@ namespace CLI.Canvas
                         EditAssignment(course);
                         break;
                     case "5":
-                        Console.WriteLine("\n=== Modules ===");
-                        if (course.Modules.Count == 0)
-                            Console.WriteLine("No modules yet.");
-                        else
-                            course.Modules.ForEach(m => Console.WriteLine($"[{m.Id}] Module with {m.Content.Count} item(s)"));
+                        ViewModules(course);
                         break;
                     case "6":
                         AddModule(course);
@@ -354,15 +350,54 @@ namespace CLI.Canvas
 
         static void AddModule(Course course)
         {
-            var module = new Module
-            {
-                Id = course.Modules.Count + 1
-            };
+            var module = new Module { Id = course.Modules.Count + 1 };
 
-            Console.Write("Enter module content (or press Enter to leave empty): ");
-            var content = Console.ReadLine();
-            if (!string.IsNullOrEmpty(content))
-                module.Content.Add(content);
+            bool addingItems = true;
+            while (addingItems)
+            {
+                Console.WriteLine("\nAdd content to this module:");
+                Console.WriteLine("1. Page (text content)");
+                Console.WriteLine("2. Assignment");
+                Console.WriteLine("3. File");
+                Console.WriteLine("4. Done");
+                Console.Write("Enter your choice: ");
+
+                switch (Console.ReadLine())
+                {
+                    case "1":
+                        Console.Write("Enter page content: ");
+                        module.Content.Add(new PageItem { Content = Console.ReadLine() });
+                        Console.WriteLine("Page added.");
+                        break;
+                    case "2":
+                        Console.Write("Assignment name: ");
+                        var an = Console.ReadLine();
+                        Console.Write("Available points: ");
+                        int.TryParse(Console.ReadLine(), out int ap);
+                        Console.Write("Due date (MM/DD/YYYY): ");
+                        DateTime.TryParse(Console.ReadLine(), out DateTime ad);
+                        module.Content.Add(new AssignmentItem
+                        {
+                            Assignment = new Assignment { Name = an, AvailablePoints = ap, DueDate = ad }
+                        });
+                        Console.WriteLine("Assignment added.");
+                        break;
+                    case "3":
+                        Console.Write("File name: ");
+                        var fn = Console.ReadLine();
+                        Console.Write("File path (optional): ");
+                        var fp = Console.ReadLine();
+                        module.Content.Add(new FileItem { FileName = fn, FilePath = fp });
+                        Console.WriteLine("File added.");
+                        break;
+                    case "4":
+                        addingItems = false;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice.");
+                        break;
+                }
+            }
 
             course.Modules.Add(module);
             Console.WriteLine($"Module added with ID {module.Id}!");
@@ -394,7 +429,7 @@ namespace CLI.Canvas
                 }
 
                 for (int i = 0; i < module.Content.Count; i++)
-                    Console.WriteLine($"[{i}] {module.Content[i]}");
+                    Console.WriteLine($"[{i}] {module.Content[i].Display()}");
 
                 Console.Write("Enter content index to remove: ");
                 if (int.TryParse(Console.ReadLine(), out int index))
@@ -435,22 +470,27 @@ namespace CLI.Canvas
                 }
 
                 for (int i = 0; i < module.Content.Count; i++)
-                    Console.WriteLine($"[{i}] {module.Content[i]}");
+                    Console.WriteLine($"[{i}] {module.Content[i].Display()}");
 
                 Console.Write("Enter content index to modify: ");
                 if (int.TryParse(Console.ReadLine(), out int index))
                 {
                     if (index >= 0 && index < module.Content.Count)
                     {
-                        Console.Write("Enter new content: ");
-                        var newContent = Console.ReadLine();
-                        if (!string.IsNullOrEmpty(newContent))
+                        if (module.Content[index] is PageItem page)
                         {
-                            module.Content[index] = newContent;
-                            Console.WriteLine("Content updated!");
+                            Console.Write("Enter new content: ");
+                            var newContent = Console.ReadLine();
+                            if (!string.IsNullOrEmpty(newContent))
+                            {
+                                page.Content = newContent;
+                                Console.WriteLine("Content updated!");
+                            }
+                            else
+                                Console.WriteLine("Content cannot be empty.");
                         }
                         else
-                            Console.WriteLine("Content cannot be empty.");
+                            Console.WriteLine("Only page items can be edited.");
                     }
                     else
                         Console.WriteLine("Invalid index.");
@@ -1157,20 +1197,7 @@ namespace CLI.Canvas
                         }
                         break;
                     case "3":
-                        Console.WriteLine("\n=== Modules ===");
-                        if (course.Modules.Count == 0)
-                            Console.WriteLine("No modules yet.");
-                        else
-                        {
-                            foreach (var module in course.Modules)
-                            {
-                                Console.WriteLine($"\nModule {module.Id}:");
-                                if (module.Content.Count == 0)
-                                    Console.WriteLine("  No content yet.");
-                                else
-                                    module.Content.ForEach(c => Console.WriteLine($"  - {c}"));
-                            }
-                        }
+                        ViewModules(course);
                         break;
                     case "4":
                         Console.WriteLine("\n=== Students in this Course ===");
@@ -1249,6 +1276,46 @@ namespace CLI.Canvas
             }
 
             Console.WriteLine($"\nWeighted course grade: {courseGrade:F1}%");
+        }
+        static void ViewModules(Course course)
+        {
+            if (course.Modules.Count == 0)
+            {
+                Console.WriteLine("No modules yet.");
+                return;
+            }
+
+            foreach (var module in course.Modules)
+            {
+                Console.WriteLine($"\nModule {module.Id}:");
+                if (module.Content.Count == 0)
+                    Console.WriteLine("  (empty)");
+                else
+                    for (int i = 0; i < module.Content.Count; i++)
+                        Console.WriteLine($"  [{i}] {module.Content[i].Display()}");
+            }
+
+            Console.Write("\nOpen a file? Enter module ID (or 0 to skip): ");
+            if (int.TryParse(Console.ReadLine(), out int mid) && mid != 0)
+            {
+                var mod = course.Modules.FirstOrDefault(m => m.Id == mid);
+                if (mod == null)
+                {
+                    Console.WriteLine("Module not found.");
+                    return;
+                }
+
+                Console.Write("Enter item index: ");
+                if (int.TryParse(Console.ReadLine(), out int idx) && idx >= 0 && idx < mod.Content.Count)
+                {
+                    if (mod.Content[idx] is FileItem file)
+                        Console.WriteLine(file.Open());
+                    else
+                        Console.WriteLine("That item is not a file.");
+                }
+                else
+                    Console.WriteLine("Invalid index.");
+            }
         }
     }
     
