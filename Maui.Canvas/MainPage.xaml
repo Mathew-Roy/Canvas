@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Maui.Canvas.MainPage">
+
+    <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
+
+        <Label Text="{Binding Title}"
+               FontSize="40"
+               HorizontalOptions="Center" />
+
+        <Label Text="Welcome! How will you use the app?"
+               FontSize="18"
+               HorizontalOptions="Center" />
+
+        <Button Text="I'm a Teacher"
+                Clicked="OnTeacherClicked"
+                WidthRequest="220" />
+
+        <Button Text="I'm a Student"
+                Clicked="OnStudentClicked"
+                WidthRequest="220" />
+
+    </VerticalStackLayout>
+
+</ContentPage>

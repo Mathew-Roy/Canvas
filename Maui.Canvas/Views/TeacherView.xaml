@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Maui.Canvas.Views.TeacherView"
+             Title="Teacher">
+
+    <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
+        <Label Text="Teacher Menu" FontSize="32" HorizontalOptions="Center" />
+        <Button Text="Back to Main Menu" Clicked="OnBackClicked" WidthRequest="220" />
+    </VerticalStackLayout>
+
+</ContentPage>
