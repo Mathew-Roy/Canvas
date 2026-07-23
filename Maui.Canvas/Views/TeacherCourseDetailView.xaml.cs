@@ -118,4 +118,75 @@ public partial class TeacherCourseDetailView : ContentPage
     {
         await Shell.Current.GoToAsync("..");
     }
+
+    private void OnAddModule(object sender, EventArgs e)
+    {
+        var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+        if (course == null) return;
+
+        int newId = course.Modules.Any() ? course.Modules.Max(m => m.Id) + 1 : 1;
+        course.Modules.Add(new Module { Id = newId });
+        Reload();
+    }
+
+    private void OnDeleteModule(object sender, EventArgs e)
+    {
+        if (((Button)sender).BindingContext is ModuleRow row)
+        {
+            var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+            var mod = course?.Modules.FirstOrDefault(m => m.Id == row.ModuleId);
+            if (mod != null) course!.Modules.Remove(mod);
+            Reload();
+        }
+    }
+
+    private async void OnAddPage(object sender, EventArgs e)
+    {
+        if (((Button)sender).BindingContext is ModuleRow row)
+        {
+            var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+            var mod = course?.Modules.FirstOrDefault(m => m.Id == row.ModuleId);
+            if (mod == null) return;
+
+            string text = await DisplayPromptAsync("Add Page", "Page content:");
+            if (!string.IsNullOrWhiteSpace(text))
+                mod.Content.Add(new PageItem { Content = text });
+            Reload();
+        }
+    }
+
+    private void OnRemoveItem(object sender, EventArgs e)
+    {
+        if (((Button)sender).BindingContext is ModuleItemRow row)
+        {
+            var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+            var mod = course?.Modules.FirstOrDefault(m => m.Id == row.ModuleId);
+            if (mod != null && row.ItemIndex >= 0 && row.ItemIndex < mod.Content.Count)
+                mod.Content.RemoveAt(row.ItemIndex);
+            Reload();
+        }
+    }
+
+    private async void OnEditItem(object sender, EventArgs e)
+    {
+        if (((Button)sender).BindingContext is ModuleItemRow row)
+        {
+            var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+            var mod = course?.Modules.FirstOrDefault(m => m.Id == row.ModuleId);
+            if (mod == null || row.ItemIndex < 0 || row.ItemIndex >= mod.Content.Count) return;
+
+            if (mod.Content[row.ItemIndex] is PageItem page)
+            {
+                string text = await DisplayPromptAsync("Edit Page", "Page content:",
+                    initialValue: page.Content ?? "");
+                if (!string.IsNullOrWhiteSpace(text))
+                    page.Content = text;
+            }
+            else
+            {
+                await DisplayAlert("Not editable", "Only page content can be edited here.", "OK");
+            }
+            Reload();
+        }
+    }
 }

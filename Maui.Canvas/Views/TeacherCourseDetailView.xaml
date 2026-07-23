@@ -67,6 +67,38 @@
             <Entry x:Name="NewAssignmentPoints" Placeholder="Available points" Keyboard="Numeric" />
             <DatePicker x:Name="NewAssignmentDue" />
             <Button Text="Add Assignment" Clicked="OnAddAssignment" />
+            <Label Text="Modules" FontSize="20" FontAttributes="Bold" />
+            <CollectionView ItemsSource="{Binding ModuleRows}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="Gray" Padding="12" Margin="0,4">
+                            <VerticalStackLayout>
+                                <Grid ColumnDefinitions="*,Auto,Auto">
+                                    <Label Grid.Column="0" Text="{Binding Title}" FontSize="16"
+                                           FontAttributes="Bold" VerticalOptions="Center" />
+                                    <Button Grid.Column="1" Text="Add Page" Clicked="OnAddPage" />
+                                    <Button Grid.Column="2" Text="Delete" Clicked="OnDeleteModule" />
+                                </Grid>
+                                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Items}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid ColumnDefinitions="*,Auto,Auto" Margin="10,2">
+                                                <Label Grid.Column="0" Text="{Binding Text}" FontSize="13"
+                                                       VerticalOptions="Center" />
+                                                <Button Grid.Column="1" Text="Edit" FontSize="12"
+                                                        Clicked="OnEditItem" />
+                                                <Button Grid.Column="2" Text="Remove" FontSize="12"
+                                                        Clicked="OnRemoveItem" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <Button Text="Add Module" Clicked="OnAddModule" />
 
             <Button Text="Back" Clicked="OnBackClicked" />
 
