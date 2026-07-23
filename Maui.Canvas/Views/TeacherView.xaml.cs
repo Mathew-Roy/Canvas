@@ -20,7 +20,10 @@ public partial class TeacherView : ContentPage
             await Shell.Current.GoToAsync($"teachercourse?courseId={course.Id}");
         }
     }
-
+private async void OnManageStudents(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("managestudents");
+    }
     private async void OnBackClicked(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync("..");

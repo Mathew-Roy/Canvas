@@ -24,6 +24,8 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
+        <Button Text="Manage Students" Clicked="OnManageStudents" />
+
         <Button Text="Back to Main Menu" Clicked="OnBackClicked" />
 
     </VerticalStackLayout>
