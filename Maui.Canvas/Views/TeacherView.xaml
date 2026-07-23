@@ -4,9 +4,27 @@
              x:Class="Maui.Canvas.Views.TeacherView"
              Title="Teacher">
 
-    <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
-        <Label Text="Teacher Menu" FontSize="32" HorizontalOptions="Center" />
-        <Button Text="Back to Main Menu" Clicked="OnBackClicked" WidthRequest="220" />
-    </VerticalStackLayout>
+    <VerticalStackLayout Spacing="15" Padding="20">
 
+        <Label Text="Select a Course" FontSize="28" HorizontalOptions="Center" />
+
+        <CollectionView ItemsSource="{Binding Courses}"
+                        SelectionMode="Single"
+                        SelectionChanged="OnCourseSelected">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame BorderColor="Gray" Padding="15" Margin="0,5">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold" />
+                            <Label Text="{Binding Code}" FontSize="14" />
+                            <Label Text="{Binding Semester}" FontSize="12" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Text="Back to Main Menu" Clicked="OnBackClicked" />
+
+    </VerticalStackLayout>
 </ContentPage>
