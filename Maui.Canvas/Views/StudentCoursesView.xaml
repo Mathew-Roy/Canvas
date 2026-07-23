@@ -9,7 +9,9 @@
         <Label Text="{Binding StudentName, StringFormat='Courses for {0}'}"
                FontSize="26" HorizontalOptions="Center" />
 
-        <CollectionView ItemsSource="{Binding Courses}">
+        <CollectionView ItemsSource="{Binding Courses}"
+                SelectionMode="Single"
+                SelectionChanged="OnCourseSelected">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame BorderColor="Gray" Padding="15" Margin="0,5">
