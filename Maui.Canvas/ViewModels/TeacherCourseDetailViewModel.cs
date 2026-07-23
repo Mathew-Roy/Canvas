@@ -10,6 +10,7 @@ namespace Maui.Canvas.ViewModels
         public Course? Course { get; private set; }
         public string CourseTitle => Course != null ? $"{Course.Name} ({Course.Code})" : "Course";
         public List<Student> Roster { get; private set; } = new();
+        public List<Assignment> Assignments { get; private set; } = new();
         public List<Student> AvailableToAdd { get; private set; } = new();
 
         public void Load(int courseId)
@@ -21,6 +22,7 @@ namespace Maui.Canvas.ViewModels
             AvailableToAdd = StudentServiceProxy.Current.Students
                 .Where(s => Course.Roster.All(r => r.Id != s.Id))
                 .ToList();
+            Assignments = Course.Assignments.ToList();
         }
     }
 }

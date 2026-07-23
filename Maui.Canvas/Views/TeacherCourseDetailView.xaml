@@ -43,6 +43,30 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+            <Label Text="Assignments" FontSize="20" FontAttributes="Bold" />
+            <CollectionView ItemsSource="{Binding Assignments}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="Gray" Padding="12" Margin="0,4">
+                            <Grid ColumnDefinitions="*,Auto,Auto">
+                                <VerticalStackLayout Grid.Column="0">
+                                    <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" />
+                                    <Label Text="{Binding AvailablePoints, StringFormat='{0} pts'}" FontSize="13" />
+                                    <Label Text="{Binding DueDate, StringFormat='Due {0:MM/dd/yyyy}'}" FontSize="12" />
+                                </VerticalStackLayout>
+                                <Button Grid.Column="1" Text="Edit" Clicked="OnEditAssignment" />
+                                <Button Grid.Column="2" Text="Delete" Clicked="OnDeleteAssignment" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="Add an Assignment" FontSize="18" FontAttributes="Bold" />
+            <Entry x:Name="NewAssignmentName" Placeholder="Assignment name" />
+            <Entry x:Name="NewAssignmentPoints" Placeholder="Available points" Keyboard="Numeric" />
+            <DatePicker x:Name="NewAssignmentDue" />
+            <Button Text="Add Assignment" Clicked="OnAddAssignment" />
 
             <Button Text="Back" Clicked="OnBackClicked" />
 
