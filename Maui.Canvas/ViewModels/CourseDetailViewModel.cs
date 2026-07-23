@@ -11,6 +11,8 @@ namespace Maui.Canvas.ViewModels
         public string Name { get; set; } = "";
         public string Info { get; set; } = "";
         public string GradeText { get; set; } = "";
+        public int AssignmentId { get; set; }
+        public string ResponseText { get; set; } = "";
     }
 
     public class ModuleDisplay
@@ -42,6 +44,7 @@ namespace Maui.Canvas.ViewModels
                     : "Not graded";
                 return new AssignmentDisplay
                 {
+                    AssignmentId = a.Id,
                     Name = a.Name ?? "",
                     Info = $"{a.AvailablePoints} pts \u2022 due {a.DueDate:MM/dd/yyyy}",
                     GradeText = grade
