@@ -9,6 +9,16 @@
 
             <Label Text="{Binding CourseTitle}" FontSize="26" FontAttributes="Bold"
                    HorizontalOptions="Center" />
+                   <Frame BackgroundColor="#2b3a55" Padding="15" Margin="0,0,0,10">
+                <VerticalStackLayout HorizontalOptions="Center">
+                    <Label Text="Current Grade" FontSize="14" TextColor="White"
+                           HorizontalOptions="Center" />
+                    <Label Text="{Binding LetterGrade}" FontSize="48" FontAttributes="Bold"
+                           TextColor="White" HorizontalOptions="Center" />
+                    <Label Text="{Binding GradePercentText}" FontSize="16" TextColor="White"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
 
             <Label Text="Assignments" FontSize="20" FontAttributes="Bold" />
             <CollectionView ItemsSource="{Binding Assignments}">
