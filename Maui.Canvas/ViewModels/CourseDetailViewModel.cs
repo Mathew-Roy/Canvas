@@ -23,6 +23,8 @@ namespace Maui.Canvas.ViewModels
     {
         public Course? Course { get; private set; }
         public string CourseTitle => Course != null ? $"{Course.Name} ({Course.Code})" : "Course";
+        public string LetterGrade { get; private set; } = "N/A";
+        public string GradePercentText { get; private set; } = "";
         public List<AssignmentDisplay> Assignments { get; private set; } = new();
         public List<ModuleDisplay> Modules { get; private set; } = new();
 
@@ -51,6 +53,44 @@ namespace Maui.Canvas.ViewModels
                 Title = $"Module {m.Id}",
                 Items = m.Content.Select(item => item.Display()).ToList()
             }).ToList();
+
+            double total = 0;
+            bool anyGraded = false;
+            foreach (var group in Course.AssignmentGroups)
+            {
+                var percents = new List<double>();
+                foreach (var a in Course.Assignments.Where(a => a.GroupId == group.Id))
+                {
+                    var sub = a.Submissions
+                        .FirstOrDefault(s => s.StudentId == studentId && s.Grade.HasValue);
+                    if (sub != null && a.AvailablePoints > 0)
+                    {
+                        percents.Add(sub.Grade!.Value / a.AvailablePoints * 100.0);
+                        anyGraded = true;
+                    }
+                }
+                if (percents.Count > 0)
+                    total += percents.Average() * (group.Weight / 100.0);
+            }
+
+            if (anyGraded)
+            {
+                LetterGrade = ToLetter(total);
+                GradePercentText = $"{total:F1}%";
+            }
+            else
+            {
+                LetterGrade = "N/A";
+                GradePercentText = "No graded work yet";
+            }
+        }
+        private static string ToLetter(double pct)
+        {
+            if (pct >= 90) return "A";
+            if (pct >= 80) return "B";
+            if (pct >= 70) return "C";
+            if (pct >= 60) return "D";
+            return "F";
         }
     }
 }

@@ -15,18 +15,39 @@ namespace Library.Canvas.Services
                 new Course { Id = 2, Code = "COP3330", Name = "Object Oriented Programming", Description = "OOP concepts in C++", Term = Term.Spring, Year = 2026, Section = "001" }
             };
 
+            // Add a demo student to the first course, along with an assignment and a module
             var demoStudent = StudentServiceProxy.Current.Students.FirstOrDefault();
             if (demoStudent != null)
             {
                 Courses[0].Roster.Add(demoStudent);
-                Courses[0].Assignments.Add(new Assignment
+
+                var essay = new Assignment
                 {
                     Id = 1,
                     Name = "Intro Essay",
                     Description = "Write a short introduction.",
                     AvailablePoints = 100,
-                    DueDate = new DateTime(2026, 9, 1)
+                    DueDate = new DateTime(2026, 9, 1),
+                    GroupId = 1
+                };
+                essay.Submissions.Add(new Submission
+                {
+                    Id = 1,
+                    StudentId = demoStudent.Id,
+                    AssignmentId = 1,
+                    Content = "My essay.",
+                    SubmissionDate = new DateTime(2026, 8, 15),
+                    Grade = 92
                 });
+                Courses[0].Assignments.Add(essay);
+
+                Courses[0].AssignmentGroups.Add(new AssignmentGroup
+                {
+                    Id = 1,
+                    Name = "Essays",
+                    Weight = 100
+                });
+
                 var demoModule = new Module { Id = 1 };
                 demoModule.Content.Add(new PageItem { Content = "Welcome to Full Stack Development!" });
                 Courses[0].Modules.Add(demoModule);
