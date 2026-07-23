@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Maui.Canvas.Views.CourseDetailView"
+             Title="Course">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="20">
+
+            <Label Text="{Binding CourseTitle}" FontSize="26" FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <Label Text="Assignments" FontSize="20" FontAttributes="Bold" />
+            <CollectionView ItemsSource="{Binding Assignments}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="Gray" Padding="12" Margin="0,4">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" />
+                                <Label Text="{Binding Info}" FontSize="13" />
+                                <Label Text="{Binding GradeText}" FontSize="13" TextColor="DarkGreen" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="Modules" FontSize="20" FontAttributes="Bold" />
+            <CollectionView ItemsSource="{Binding Modules}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="Gray" Padding="12" Margin="0,4">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Title}" FontSize="16" FontAttributes="Bold" />
+                                <VerticalStackLayout BindableLayout.ItemsSource="{Binding Items}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Label Text="{Binding .}" FontSize="13" />
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Text="Back" Clicked="OnBackClicked" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
