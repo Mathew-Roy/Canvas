@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Maui.Canvas.Views.StudentView"
-             Title="Select a Student">
+             x:Class="Maui.Canvas.Views.StudentCoursesView"
+             Title="My Courses">
 
     <VerticalStackLayout Spacing="15" Padding="20">
 
-        <Label Text="Select a Student" FontSize="28" HorizontalOptions="Center" />
+        <Label Text="{Binding StudentName, StringFormat='Courses for {0}'}"
+               FontSize="26" HorizontalOptions="Center" />
 
-        <CollectionView ItemsSource="{Binding Students}"
-                        SelectionMode="Single"
-                        SelectionChanged="OnStudentSelected">
+        <CollectionView ItemsSource="{Binding Courses}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame BorderColor="Gray" Padding="15" Margin="0,5">
                         <VerticalStackLayout>
                             <Label Text="{Binding Name}" FontSize="18" FontAttributes="Bold" />
-                            <Label Text="{Binding Classification}" FontSize="14" />
+                            <Label Text="{Binding Code}" FontSize="14" />
+                            <Label Text="{Binding Semester}" FontSize="12" />
                         </VerticalStackLayout>
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Button Text="Back to Main Menu" Clicked="OnBackClicked" />
+        <Label Text="This student is not enrolled in any courses."
+               IsVisible="{Binding HasNoCourses}"
+               HorizontalOptions="Center" />
+
+        <Button Text="Back" Clicked="OnBackClicked" />
 
     </VerticalStackLayout>
 </ContentPage>
