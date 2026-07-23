@@ -29,6 +29,11 @@
                                 <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" />
                                 <Label Text="{Binding Info}" FontSize="13" />
                                 <Label Text="{Binding GradeText}" FontSize="13" TextColor="DarkGreen" />
+                                <Editor Placeholder="Type your response..."
+                                        Text="{Binding ResponseText}"
+                                        HeightRequest="80" />
+                                <Button Text="Submit Response"
+                                        Clicked="OnSubmitResponse" />
                             </VerticalStackLayout>
                         </Frame>
                     </DataTemplate>

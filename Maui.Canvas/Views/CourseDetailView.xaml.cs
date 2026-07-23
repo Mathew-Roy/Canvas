@@ -1,3 +1,7 @@
+using System;
+using System.Linq;
+using Library.Canvas.Models;
+using Library.Canvas.Services;
 using Maui.Canvas.ViewModels;
 
 namespace Maui.Canvas.Views;
@@ -37,5 +41,37 @@ public partial class CourseDetailView : ContentPage
     private async void OnBackClicked(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync("..");
+    }
+
+    private async void OnSubmitResponse(object sender, EventArgs e)
+    {
+        if (((Button)sender).BindingContext is AssignmentDisplay display)
+        {
+            if (string.IsNullOrWhiteSpace(display.ResponseText))
+            {
+                await DisplayAlert("Empty", "Please type a response before submitting.", "OK");
+                return;
+            }
+
+            var course = CourseServiceProxy.Current.Courses
+                .FirstOrDefault(c => c.Id == _courseId);
+            var assignment = course?.Assignments
+                .FirstOrDefault(a => a.Id == display.AssignmentId);
+
+            if (assignment != null)
+            {
+                assignment.Submissions.Add(new Submission
+                {
+                    Id = assignment.Submissions.Count + 1,
+                    StudentId = _studentId,
+                    AssignmentId = assignment.Id,
+                    Content = display.ResponseText,
+                    SubmissionDate = DateTime.Now
+                });
+
+                await DisplayAlert("Submitted",
+                    $"Your response to '{assignment.Name}' was submitted.", "OK");
+            }
+        }
     }
 }
