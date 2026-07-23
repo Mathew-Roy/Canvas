@@ -53,6 +53,67 @@ public partial class TeacherCourseDetailView : ContentPage
         }
     }
 
+    private void OnAddAssignment(object sender, EventArgs e)
+    {
+        var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+        if (course == null) return;
+
+        string name = NewAssignmentName.Text;
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        int.TryParse(NewAssignmentPoints.Text, out int points);
+        int newId = course.Assignments.Any() ? course.Assignments.Max(a => a.Id) + 1 : 1;
+
+        course.Assignments.Add(new Assignment
+        {
+            Id = newId,
+            Name = name,
+            AvailablePoints = points,
+            DueDate = NewAssignmentDue.Date
+        });
+
+        NewAssignmentName.Text = string.Empty;
+        NewAssignmentPoints.Text = string.Empty;
+        Reload();
+    }
+
+    private void OnDeleteAssignment(object sender, EventArgs e)
+    {
+        if (((Button)sender).BindingContext is Assignment assignment)
+        {
+            var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+            var target = course?.Assignments.FirstOrDefault(a => a.Id == assignment.Id);
+            if (target != null)
+            {
+                target.Submissions.Clear();          // cascade: delete its submissions
+                course!.Assignments.Remove(target);
+            }
+            Reload();
+        }
+    }
+
+    private async void OnEditAssignment(object sender, EventArgs e)
+    {
+        if (((Button)sender).BindingContext is Assignment assignment)
+        {
+            var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+            var target = course?.Assignments.FirstOrDefault(a => a.Id == assignment.Id);
+            if (target == null) return;
+
+            string newName = await DisplayPromptAsync("Edit Assignment", "Name:",
+                initialValue: target.Name ?? "");
+            if (!string.IsNullOrWhiteSpace(newName))
+                target.Name = newName;
+
+            string newPoints = await DisplayPromptAsync("Edit Assignment", "Available points:",
+                initialValue: target.AvailablePoints.ToString());
+            if (int.TryParse(newPoints, out int pts))
+                target.AvailablePoints = pts;
+
+            Reload();
+        }
+    }
+
     private async void OnBackClicked(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync("..");
