@@ -29,12 +29,13 @@ namespace Maui.Canvas.ViewModels
         public string GradePercentText { get; private set; } = "";
         public List<AssignmentDisplay> Assignments { get; private set; } = new();
         public List<ModuleDisplay> Modules { get; private set; } = new();
-
+        public List<string> Announcements { get; private set; } = new();
+        public bool HasAnnouncements => Announcements.Count > 0;
         public void Load(int courseId, int studentId)
         {
             Course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == courseId);
             if (Course == null) return;
-
+            Announcements = Course.Announcements.ToList();
             Assignments = Course.Assignments.Select(a =>
             {
                 var sub = a.Submissions
@@ -95,5 +96,6 @@ namespace Maui.Canvas.ViewModels
             if (pct >= 60) return "D";
             return "F";
         }
+        
     }
 }

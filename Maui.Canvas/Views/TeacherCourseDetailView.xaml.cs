@@ -259,4 +259,26 @@ public partial class TeacherCourseDetailView : ContentPage
         await DisplayAlert("Imported", $"Added {added} new student(s).", "OK");
         Reload();
     }
+    private void OnPostAnnouncement(object sender, EventArgs e)
+    {
+        var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+        if (course == null) return;
+
+        string text = NewAnnouncement.Text;
+        if (string.IsNullOrWhiteSpace(text)) return;
+
+        course.Announcements.Add(text);
+        NewAnnouncement.Text = string.Empty;
+        Reload();
+    }
+
+    private void OnDeleteAnnouncement(object sender, EventArgs e)
+    {
+        if (((Button)sender).BindingContext is string text)
+        {
+            var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+            course?.Announcements.Remove(text);
+            Reload();
+        }
+    }
 }
