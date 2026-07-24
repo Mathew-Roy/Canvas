@@ -67,6 +67,12 @@
             <Entry x:Name="NewAssignmentPoints" Placeholder="Available points" Keyboard="Numeric" />
             <DatePicker x:Name="NewAssignmentDue" />
             <Button Text="Add Assignment" Clicked="OnAddAssignment" />
+            <Label Text="Copy Assignments From Another Course" FontSize="16" FontAttributes="Bold" />
+            <Picker x:Name="SourceCoursePicker"
+                    ItemsSource="{Binding OtherCourses}"
+                    ItemDisplayBinding="{Binding Name}"
+                    Title="Select a course" />
+            <Button Text="Copy Assignments" Clicked="OnCopyAssignments" />
             <Label Text="Modules" FontSize="20" FontAttributes="Bold" />
             <CollectionView ItemsSource="{Binding ModuleRows}">
                 <CollectionView.ItemTemplate>

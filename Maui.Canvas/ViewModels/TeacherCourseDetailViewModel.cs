@@ -11,6 +11,7 @@ namespace Maui.Canvas.ViewModels
         public string CourseTitle => Course != null ? $"{Course.Name} ({Course.Code})" : "Course";
         public List<Student> Roster { get; private set; } = new();
         public List<Assignment> Assignments { get; private set; } = new();
+        public List<Course> OtherCourses { get; private set; } = new();
         public List<ModuleRow> ModuleRows { get; private set; } = new();
         public List<Student> AvailableToAdd { get; private set; } = new();
 
@@ -35,6 +36,9 @@ namespace Maui.Canvas.ViewModels
                     Text = item.Display()
                 }).ToList()
             }).ToList();
+            OtherCourses = CourseServiceProxy.Current.Courses
+                .Where(c => c.Id != courseId)
+                .ToList();
         }
     }
 
