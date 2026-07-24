@@ -189,4 +189,28 @@ public partial class TeacherCourseDetailView : ContentPage
             Reload();
         }
     }
+    private void OnCopyAssignments(object sender, EventArgs e)
+    {
+        if (SourceCoursePicker.SelectedItem is not Course source) return;
+
+        var dest = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+        if (dest == null) return;
+
+        foreach (var a in source.Assignments)
+        {
+            int newId = dest.Assignments.Any() ? dest.Assignments.Max(x => x.Id) + 1 : 1;
+            dest.Assignments.Add(new Assignment
+            {
+                Id = newId,
+                Name = a.Name,
+                Description = a.Description,
+                AvailablePoints = a.AvailablePoints,
+                DueDate = a.DueDate,
+                GroupId = a.GroupId
+                // Submissions intentionally NOT copied
+            });
+        }
+
+        Reload();
+    }
 }
