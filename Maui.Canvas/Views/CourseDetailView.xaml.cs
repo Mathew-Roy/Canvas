@@ -74,4 +74,8 @@ public partial class CourseDetailView : ContentPage
             }
         }
     }
+    private async void OnMainMenuClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("//MainPage");
+    }
 }

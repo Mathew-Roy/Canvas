@@ -126,6 +126,7 @@
             <Button Text="Add Module" Clicked="OnAddModule" />
 
             <Button Text="Back" Clicked="OnBackClicked" />
+            <Button Text="Main Menu" Clicked="OnMainMenuClicked" />
 
         </VerticalStackLayout>
     </ScrollView>

@@ -281,4 +281,8 @@ public partial class TeacherCourseDetailView : ContentPage
             Reload();
         }
     }
+    private async void OnMainMenuClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("//MainPage");
+    }
 }

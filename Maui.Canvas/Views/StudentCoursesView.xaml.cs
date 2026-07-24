@@ -41,4 +41,8 @@ public partial class StudentCoursesView : ContentPage
     {
         await Shell.Current.GoToAsync("..");
     }
+    private async void OnMainMenuClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("//MainPage");
+    }
 }
