@@ -9,6 +9,18 @@
 
             <Label Text="{Binding CourseTitle}" FontSize="26" FontAttributes="Bold"
                    HorizontalOptions="Center" />
+                   <Frame BackgroundColor="#5a2b2b" Padding="12" IsVisible="{Binding HasAnnouncements}">
+                <VerticalStackLayout>
+                    <Label Text="Announcements" FontSize="16" FontAttributes="Bold" TextColor="White" />
+                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Announcements}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding .}" FontSize="14" TextColor="White" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
                    <Frame BackgroundColor="#2b3a55" Padding="15" Margin="0,0,0,10">
                 <VerticalStackLayout HorizontalOptions="Center">
                     <Label Text="Current Grade" FontSize="14" TextColor="White"

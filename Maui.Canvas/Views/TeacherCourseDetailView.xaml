@@ -10,6 +10,22 @@
             <Label Text="{Binding CourseTitle}" FontSize="26" FontAttributes="Bold"
                    HorizontalOptions="Center" />
 
+            <Label Text="Announcements" FontSize="20" FontAttributes="Bold" />
+            <CollectionView ItemsSource="{Binding Announcements}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                            <Label Grid.Column="0" Text="{Binding .}" FontSize="14"
+                                   VerticalOptions="Center" />
+                            <Button Grid.Column="1" Text="Delete" FontSize="12"
+                                    Clicked="OnDeleteAnnouncement" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <Entry x:Name="NewAnnouncement" Placeholder="New announcement" />
+            <Button Text="Post Announcement" Clicked="OnPostAnnouncement" />
+
             <Label Text="Enrolled Students" FontSize="20" FontAttributes="Bold" />
             <CollectionView ItemsSource="{Binding Roster}">
                 <CollectionView.ItemTemplate>

@@ -20,6 +20,7 @@ namespace Library.Canvas.Services
             if (demoStudent != null)
             {
                 Courses[0].Roster.Add(demoStudent);
+                Courses[0].Announcements.Add("Welcome to the course! Your first assignment is due soon.");
 
                 var essay = new Assignment
                 {
@@ -51,6 +52,8 @@ namespace Library.Canvas.Services
                 var demoModule = new Module { Id = 1 };
                 demoModule.Content.Add(new PageItem { Content = "Welcome to Full Stack Development!" });
                 Courses[0].Modules.Add(demoModule);
+
+
             }
         }
 
