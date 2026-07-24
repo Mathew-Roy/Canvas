@@ -43,6 +43,9 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+            <Label Text="Roster Export / Import" FontSize="16" FontAttributes="Bold" />
+            <Button Text="Export Roster" Clicked="OnExportRoster" />
+            <Button Text="Import Roster" Clicked="OnImportRoster" />
             <Label Text="Assignments" FontSize="20" FontAttributes="Bold" />
             <CollectionView ItemsSource="{Binding Assignments}">
                 <CollectionView.ItemTemplate>
