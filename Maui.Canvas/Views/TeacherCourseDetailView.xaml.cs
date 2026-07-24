@@ -2,6 +2,7 @@ using System.Linq;
 using Library.Canvas.Models;
 using Library.Canvas.Services;
 using Maui.Canvas.ViewModels;
+using Microsoft.Maui.Storage;
 
 namespace Maui.Canvas.Views;
 
@@ -211,6 +212,51 @@ public partial class TeacherCourseDetailView : ContentPage
             });
         }
 
+        Reload();
+    }
+    private async void OnExportRoster(object sender, EventArgs e)
+    {
+        var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+        if (course == null) return;
+
+        var lines = course.Roster.Select(s => $"{s.Id},{s.Name}");
+        string path = System.IO.Path.Combine(FileSystem.AppDataDirectory, "roster_export.csv");
+        System.IO.File.WriteAllLines(path, lines);
+
+        await DisplayAlert("Exported",
+            $"Exported {course.Roster.Count} student(s) to:\n{path}", "OK");
+    }
+
+    private async void OnImportRoster(object sender, EventArgs e)
+    {
+        var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+        if (course == null) return;
+
+        string path = System.IO.Path.Combine(FileSystem.AppDataDirectory, "roster_export.csv");
+        if (!System.IO.File.Exists(path))
+        {
+            await DisplayAlert("No File", "No roster file found. Export one first.", "OK");
+            return;
+        }
+
+        int added = 0;
+        foreach (var line in System.IO.File.ReadAllLines(path))
+        {
+            var parts = line.Split(',');
+            if (parts.Length < 1 || !int.TryParse(parts[0], out int id)) continue;
+
+            // idempotent + non-destructive: only add students not already enrolled
+            if (course.Roster.Any(s => s.Id == id)) continue;
+
+            var student = StudentServiceProxy.Current.Students.FirstOrDefault(s => s.Id == id);
+            if (student != null)
+            {
+                course.Roster.Add(student);
+                added++;
+            }
+        }
+
+        await DisplayAlert("Imported", $"Added {added} new student(s).", "OK");
         Reload();
     }
 }
