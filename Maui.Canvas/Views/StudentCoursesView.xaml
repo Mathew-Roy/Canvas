@@ -30,6 +30,7 @@
                HorizontalOptions="Center" />
 
         <Button Text="Back" Clicked="OnBackClicked" />
+        <Button Text="Main Menu" Clicked="OnMainMenuClicked" />
 
     </VerticalStackLayout>
 </ContentPage>
