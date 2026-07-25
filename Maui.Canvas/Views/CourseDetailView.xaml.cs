@@ -3,6 +3,7 @@ using System.Linq;
 using Library.Canvas.Models;
 using Library.Canvas.Services;
 using Maui.Canvas.ViewModels;
+using Microsoft.Maui.Storage;
 
 namespace Maui.Canvas.Views;
 
@@ -47,9 +48,10 @@ public partial class CourseDetailView : ContentPage
     {
         if (((Button)sender).BindingContext is AssignmentDisplay display)
         {
-            if (string.IsNullOrWhiteSpace(display.ResponseText))
+            if (string.IsNullOrWhiteSpace(display.ResponseText)
+                && string.IsNullOrWhiteSpace(display.AttachedFileName))
             {
-                await DisplayAlert("Empty", "Please type a response before submitting.", "OK");
+                await DisplayAlert("Empty", "Type a response or attach a file before submitting.", "OK");
                 return;
             }
 
@@ -66,16 +68,33 @@ public partial class CourseDetailView : ContentPage
                     StudentId = _studentId,
                     AssignmentId = assignment.Id,
                     Content = display.ResponseText,
+                    AttachedFileName = display.AttachedFileName,
+                    AttachedFilePath = display.AttachedFilePath,
                     SubmissionDate = DateTime.Now
                 });
 
                 await DisplayAlert("Submitted",
-                    $"Your response to '{assignment.Name}' was submitted.", "OK");
+                    $"Your response to '{assignment.Name}' was submitted." +
+                    (string.IsNullOrWhiteSpace(display.AttachedFileName) ? "" : $"\nFile: {display.AttachedFileName}"),
+                    "OK");
             }
         }
     }
     private async void OnMainMenuClicked(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync("//MainPage");
+    }
+    private async void OnAttachFile(object sender, EventArgs e)
+    {
+        if (((Button)sender).BindingContext is AssignmentDisplay display)
+        {
+            var result = await FilePicker.Default.PickAsync();
+            if (result != null)
+            {
+                display.AttachedFileName = result.FileName;
+                display.AttachedFilePath = result.FullPath;
+                await DisplayAlert("File Attached", $"Attached: {result.FileName}", "OK");
+            }
+        }
     }
 }

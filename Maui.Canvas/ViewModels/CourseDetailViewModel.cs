@@ -13,6 +13,8 @@ namespace Maui.Canvas.ViewModels
         public string GradeText { get; set; } = "";
         public int AssignmentId { get; set; }
         public string ResponseText { get; set; } = "";
+        public string? AttachedFileName { get; set; }
+        public string? AttachedFilePath { get; set; }
     }
 
     public class ModuleDisplay
