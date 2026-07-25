@@ -9,5 +9,7 @@ namespace Library.Canvas.Models
         public DateTime SubmissionDate { get; set; }
         public double? Grade { get; set; } 
         public string? Feedback { get; set; }
+        public string? AttachedFileName { get; set; }
+        public string? AttachedFilePath { get; set; }
     }
 }
