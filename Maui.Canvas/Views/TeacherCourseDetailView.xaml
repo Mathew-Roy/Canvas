@@ -62,6 +62,7 @@
             <Label Text="Roster Export / Import" FontSize="16" FontAttributes="Bold" />
             <Button Text="Export Roster" Clicked="OnExportRoster" />
             <Button Text="Import Roster" Clicked="OnImportRoster" />
+            <Button Text="Export Gradebook (CSV)" Clicked="OnExportGradebook" />
             <Label Text="Assignments" FontSize="20" FontAttributes="Bold" />
             <CollectionView ItemsSource="{Binding Assignments}">
                 <CollectionView.ItemTemplate>
