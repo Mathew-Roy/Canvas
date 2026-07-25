@@ -375,4 +375,8 @@ public partial class TeacherCourseDetailView : ContentPage
         await DisplayAlert("Imported", $"Added {added} assignment(s).", "OK");
         Reload();
     }
+    private async void OnCourseSettings(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync($"coursesettings?courseId={_courseId}");
+    }
 }

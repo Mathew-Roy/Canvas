@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Maui.Canvas.Views.CourseSettingsView"
+             Title="Course Settings">
+
+    <VerticalStackLayout Spacing="15" Padding="20">
+
+        <Label Text="Letter Grade Ranges" FontSize="24" FontAttributes="Bold"
+               HorizontalOptions="Center" />
+        <Label Text="Minimum percentage for each letter grade:" />
+
+        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto"
+              ColumnSpacing="10" RowSpacing="10">
+            <Label Grid.Row="0" Grid.Column="0" Text="A ≥" VerticalOptions="Center" />
+            <Entry Grid.Row="0" Grid.Column="1" x:Name="EntryA" Keyboard="Numeric" />
+            <Label Grid.Row="1" Grid.Column="0" Text="B ≥" VerticalOptions="Center" />
+            <Entry Grid.Row="1" Grid.Column="1" x:Name="EntryB" Keyboard="Numeric" />
+            <Label Grid.Row="2" Grid.Column="0" Text="C ≥" VerticalOptions="Center" />
+            <Entry Grid.Row="2" Grid.Column="1" x:Name="EntryC" Keyboard="Numeric" />
+            <Label Grid.Row="3" Grid.Column="0" Text="D ≥" VerticalOptions="Center" />
+            <Entry Grid.Row="3" Grid.Column="1" x:Name="EntryD" Keyboard="Numeric" />
+        </Grid>
+
+        <Button Text="Save" Clicked="OnSave" />
+        <Button Text="Back" Clicked="OnBackClicked" />
+
+    </VerticalStackLayout>
+</ContentPage>

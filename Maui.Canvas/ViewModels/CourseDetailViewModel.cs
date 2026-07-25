@@ -88,12 +88,13 @@ namespace Maui.Canvas.ViewModels
                 GradePercentText = "No graded work yet";
             }
         }
-        private static string ToLetter(double pct)
+        private string ToLetter(double pct)
         {
-            if (pct >= 90) return "A";
-            if (pct >= 80) return "B";
-            if (pct >= 70) return "C";
-            if (pct >= 60) return "D";
+            if (Course == null) return "F";
+            if (pct >= Course.GradeA) return "A";
+            if (pct >= Course.GradeB) return "B";
+            if (pct >= Course.GradeC) return "C";
+            if (pct >= Course.GradeD) return "D";
             return "F";
         }
         
