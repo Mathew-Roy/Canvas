@@ -285,4 +285,36 @@ public partial class TeacherCourseDetailView : ContentPage
     {
         await Shell.Current.GoToAsync("//MainPage");
     }
+    private async void OnExportGradebook(object sender, EventArgs e)
+    {
+        var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+        if (course == null) return;
+
+        var sb = new System.Text.StringBuilder();
+
+        // Header row: Student, then one column per assignment
+        sb.Append("Student");
+        foreach (var a in course.Assignments)
+            sb.Append($",{a.Name}");
+        sb.AppendLine();
+
+        // One row per student, with their grade in each assignment column
+        foreach (var student in course.Roster)
+        {
+            sb.Append(student.Name);
+            foreach (var a in course.Assignments)
+            {
+                var sub = a.Submissions
+                    .FirstOrDefault(s => s.StudentId == student.Id && s.Grade.HasValue);
+                sb.Append($",{(sub != null ? sub.Grade.ToString() : "")}");
+            }
+            sb.AppendLine();
+        }
+
+        string path = System.IO.Path.Combine(FileSystem.AppDataDirectory,
+            $"gradebook_course{course.Id}.csv");
+        System.IO.File.WriteAllText(path, sb.ToString());
+
+        await DisplayAlert("Gradebook Exported", $"Saved to:\n{path}", "OK");
+    }
 }
