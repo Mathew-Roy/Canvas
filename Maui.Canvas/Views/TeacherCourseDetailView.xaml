@@ -9,6 +9,7 @@
 
             <Label Text="{Binding CourseTitle}" FontSize="26" FontAttributes="Bold"
                    HorizontalOptions="Center" />
+            <Button Text="Course Settings" Clicked="OnCourseSettings" />
 
             <Label Text="Announcements" FontSize="20" FontAttributes="Bold" />
             <CollectionView ItemsSource="{Binding Announcements}">

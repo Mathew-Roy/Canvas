@@ -28,5 +28,9 @@ namespace Library.Canvas.Models
     
         public List<string> Announcements { get; set; } = new List<string>();
     
+        public int GradeA { get; set; } = 90;
+        public int GradeB { get; set; } = 80;
+        public int GradeC { get; set; } = 70;
+        public int GradeD { get; set; } = 60;
     }
 }
