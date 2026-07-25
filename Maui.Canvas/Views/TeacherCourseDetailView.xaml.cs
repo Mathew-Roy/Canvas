@@ -317,4 +317,62 @@ public partial class TeacherCourseDetailView : ContentPage
 
         await DisplayAlert("Gradebook Exported", $"Saved to:\n{path}", "OK");
     }
+    private async void OnExportAssignments(object sender, EventArgs e)
+    {
+        var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+        if (course == null) return;
+
+        var lines = course.Assignments.Select(a =>
+            $"{a.Name}|{a.Description}|{a.AvailablePoints}|{a.DueDate:o}|{a.GroupId}");
+        string path = System.IO.Path.Combine(FileSystem.AppDataDirectory, "assignments_export.csv");
+        System.IO.File.WriteAllLines(path, lines);
+
+        await DisplayAlert("Exported",
+            $"Exported {course.Assignments.Count} assignment(s) to:\n{path}", "OK");
+    }
+
+    private async void OnImportAssignments(object sender, EventArgs e)
+    {
+        var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+        if (course == null) return;
+
+        string path = System.IO.Path.Combine(FileSystem.AppDataDirectory, "assignments_export.csv");
+        if (!System.IO.File.Exists(path))
+        {
+            await DisplayAlert("No File", "No assignments file found. Export one first.", "OK");
+            return;
+        }
+
+        int added = 0;
+        foreach (var line in System.IO.File.ReadAllLines(path))
+        {
+            var parts = line.Split('|');
+            if (parts.Length < 5) continue;
+
+            string name = parts[0];
+            if (string.IsNullOrWhiteSpace(name)) continue;
+
+            // non-destructive: skip if this course already has an assignment with that name
+            if (course.Assignments.Any(a => a.Name == name)) continue;
+
+            int.TryParse(parts[2], out int pts);
+            DateTime.TryParse(parts[3], out DateTime due);
+            int? groupId = int.TryParse(parts[4], out int g) ? g : (int?)null;
+
+            int newId = course.Assignments.Any() ? course.Assignments.Max(a => a.Id) + 1 : 1;
+            course.Assignments.Add(new Assignment
+            {
+                Id = newId,
+                Name = name,
+                Description = parts[1],
+                AvailablePoints = pts,
+                DueDate = due,
+                GroupId = groupId
+            });
+            added++;
+        }
+
+        await DisplayAlert("Imported", $"Added {added} assignment(s).", "OK");
+        Reload();
+    }
 }
