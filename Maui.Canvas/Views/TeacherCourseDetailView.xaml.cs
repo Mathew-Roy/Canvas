@@ -10,6 +10,7 @@ namespace Maui.Canvas.Views;
 public partial class TeacherCourseDetailView : ContentPage
 {
     private int _courseId;
+    private string _searchText = "";
 
     public string CourseId
     {
@@ -21,12 +22,18 @@ public partial class TeacherCourseDetailView : ContentPage
         InitializeComponent();
     }
 
+private void OnRosterSearch(object sender, TextChangedEventArgs e)
+    {
+        _searchText = e.NewTextValue ?? "";
+        Reload();
+    }
+    
     private void Reload()
     {
         if (_courseId > 0)
         {
             var vm = new TeacherCourseDetailViewModel();
-            vm.Load(_courseId);
+            vm.Load(_courseId, _searchText);
             BindingContext = vm;
         }
     }

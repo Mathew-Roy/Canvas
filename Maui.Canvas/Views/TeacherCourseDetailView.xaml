@@ -27,6 +27,9 @@
             <Entry x:Name="NewAnnouncement" Placeholder="New announcement" />
             <Button Text="Post Announcement" Clicked="OnPostAnnouncement" />
 
+            <SearchBar x:Name="RosterSearch" Placeholder="Search students..."
+                       TextChanged="OnRosterSearch" />
+
             <Label Text="Enrolled Students" FontSize="20" FontAttributes="Bold" />
             <CollectionView ItemsSource="{Binding Roster}">
                 <CollectionView.ItemTemplate>
