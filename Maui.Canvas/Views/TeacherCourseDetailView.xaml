@@ -89,6 +89,7 @@
             <Entry x:Name="NewAssignmentName" Placeholder="Assignment name" />
             <Entry x:Name="NewAssignmentPoints" Placeholder="Available points" Keyboard="Numeric" />
             <DatePicker x:Name="NewAssignmentDue" />
+            <Entry x:Name="NewAssignmentQuestion" Placeholder="Quiz question (optional)" />
             <Button Text="Add Assignment" Clicked="OnAddAssignment" />
             <Label Text="Copy Assignments From Another Course" FontSize="16" FontAttributes="Bold" />
             <Picker x:Name="SourceCoursePicker"

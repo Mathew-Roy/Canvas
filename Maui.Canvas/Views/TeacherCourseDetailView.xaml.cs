@@ -65,16 +65,21 @@ public partial class TeacherCourseDetailView : ContentPage
         int.TryParse(NewAssignmentPoints.Text, out int points);
         int newId = course.Assignments.Any() ? course.Assignments.Max(a => a.Id) + 1 : 1;
 
+        string question = NewAssignmentQuestion.Text;
+
         course.Assignments.Add(new Assignment
         {
             Id = newId,
             Name = name,
             AvailablePoints = points,
-            DueDate = NewAssignmentDue.Date
+            DueDate = NewAssignmentDue.Date,
+            IsQuiz = !string.IsNullOrWhiteSpace(question),
+            Question = question
         });
 
         NewAssignmentName.Text = string.Empty;
         NewAssignmentPoints.Text = string.Empty;
+        NewAssignmentQuestion.Text = string.Empty;
         Reload();
     }
 

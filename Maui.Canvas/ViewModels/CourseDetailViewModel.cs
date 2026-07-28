@@ -15,6 +15,8 @@ namespace Maui.Canvas.ViewModels
         public string ResponseText { get; set; } = "";
         public string? AttachedFileName { get; set; }
         public string? AttachedFilePath { get; set; }
+        public bool IsQuiz { get; set; }
+        public string? Question { get; set; }
     }
 
     public class ModuleDisplay
@@ -33,6 +35,7 @@ namespace Maui.Canvas.ViewModels
         public List<ModuleDisplay> Modules { get; private set; } = new();
         public List<string> Announcements { get; private set; } = new();
         public bool HasAnnouncements => Announcements.Count > 0;
+
         public void Load(int courseId, int studentId)
         {
             Course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == courseId);
@@ -50,7 +53,9 @@ namespace Maui.Canvas.ViewModels
                     AssignmentId = a.Id,
                     Name = a.Name ?? "",
                     Info = $"{a.AvailablePoints} pts \u2022 due {a.DueDate:MM/dd/yyyy}",
-                    GradeText = grade
+                    GradeText = grade,
+                    IsQuiz = a.IsQuiz,
+                    Question = a.Question
                 };
             }).ToList();
 
