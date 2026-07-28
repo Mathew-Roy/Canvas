@@ -25,7 +25,7 @@
         </CollectionView>
 
         <Button Text="Manage Students" Clicked="OnManageStudents" />
-
+        <Button Text="Manage Semesters" Clicked="OnManageSemesters" />
         <Button Text="Back to Main Menu" Clicked="OnBackClicked" />
 
     </VerticalStackLayout>
