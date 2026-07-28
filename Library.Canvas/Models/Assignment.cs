@@ -9,5 +9,7 @@ namespace Library.Canvas.Models
         public DateTime DueDate { get; set; }
         public int? GroupId { get; set; }
         public List<Submission> Submissions { get; set; } = new List<Submission>();
+        public bool IsQuiz { get; set; }
+        public string? Question { get; set; }
     }
 }

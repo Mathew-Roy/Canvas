@@ -41,6 +41,9 @@
                                 <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" />
                                 <Label Text="{Binding Info}" FontSize="13" />
                                 <Label Text="{Binding GradeText}" FontSize="13" TextColor="DarkGreen" />
+                                <Label Text="{Binding Question, StringFormat='Quiz: {0}'}"
+                                       IsVisible="{Binding IsQuiz}"
+                                       FontSize="14" FontAttributes="Italic" />
                                 <Editor Placeholder="Type your response..."
                                         Text="{Binding ResponseText}"
                                         HeightRequest="80" />
