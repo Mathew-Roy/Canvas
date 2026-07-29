@@ -391,4 +391,20 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
     {
         await Shell.Current.GoToAsync($"coursesettings?courseId={_courseId}");
     }
+    private async void OnAddTeacherComment(object sender, EventArgs e)
+    {
+        if (((Button)sender).BindingContext is Assignment assignment)
+        {
+            string text = await DisplayPromptAsync("Add Comment", "Your comment:");
+            if (string.IsNullOrWhiteSpace(text)) return;
+
+            assignment.Comments.Add(new Comment
+            {
+                Author = "Instructor",
+                Text = text,
+                PostedAt = DateTime.Now
+            });
+            Reload();
+        }
+    }
 }

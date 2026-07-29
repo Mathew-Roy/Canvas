@@ -50,6 +50,15 @@
                                 <Button Text="Attach File" Clicked="OnAttachFile" />
                                 <Button Text="Submit Response"
                                         Clicked="OnSubmitResponse" />
+                            <Label Text="Comments" FontSize="13" FontAttributes="Bold" />
+                                <VerticalStackLayout BindableLayout.ItemsSource="{Binding CommentLines}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Label Text="{Binding .}" FontSize="12" />
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                                <Button Text="Add Comment" Clicked="OnAddComment" />
                             </VerticalStackLayout>
                         </Frame>
                     </DataTemplate>
