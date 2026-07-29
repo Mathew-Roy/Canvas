@@ -1,4 +1,5 @@
 using Library.Canvas.Models;
+using Library.Canvas.Database;
 
 namespace Library.Canvas.Services
 {
@@ -9,13 +10,20 @@ namespace Library.Canvas.Services
 
         private StudentServiceProxy()
         {
-            Students = new List<Student>
+            Students = CanvasDbContext.Current.GetStudents();
+            if (Students.Count == 0)
             {
-                new Student { Id = 1, Name = "Alice Smith", Code = "as21a", Classification = "Junior" },
-                new Student { Id = 2, Name = "Bob Jones", Code = "bj22b", Classification = "Senior" },
-                new Student { Id = 3, Name = "Carol White", Code = "cw23c", Classification = "Sophomore" }
-            };
+                Students = Seed();
+                CanvasDbContext.Current.SaveStudents(Students);
+            }
         }
+
+        private List<Student> Seed() => new List<Student>
+        {
+            // >>> MOVE your existing seeded students here (Alice, Bob, Carol) <
+        };
+
+        public void Save() => CanvasDbContext.Current.SaveStudents(Students);
 
         public static StudentServiceProxy Current
         {
