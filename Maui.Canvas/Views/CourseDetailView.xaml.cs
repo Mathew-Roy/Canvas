@@ -97,4 +97,26 @@ public partial class CourseDetailView : ContentPage
             }
         }
     }
+    private async void OnAddComment(object sender, EventArgs e)
+    {
+        if (((Button)sender).BindingContext is AssignmentDisplay display)
+        {
+            string text = await DisplayPromptAsync("Add Comment", "Your comment:");
+            if (string.IsNullOrWhiteSpace(text)) return;
+
+            var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+            var assignment = course?.Assignments.FirstOrDefault(a => a.Id == display.AssignmentId);
+            var student = StudentServiceProxy.Current.Students.FirstOrDefault(s => s.Id == _studentId);
+            if (assignment != null)
+            {
+                assignment.Comments.Add(new Comment
+                {
+                    Author = student?.Name ?? "Student",
+                    Text = text,
+                    PostedAt = DateTime.Now
+                });
+                TryLoad();   // refresh the page so the new comment shows
+            }
+        }
+    }
 }

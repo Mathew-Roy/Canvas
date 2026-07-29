@@ -17,6 +17,7 @@ namespace Maui.Canvas.ViewModels
         public string? AttachedFilePath { get; set; }
         public bool IsQuiz { get; set; }
         public string? Question { get; set; }
+        public List<string> CommentLines { get; set; } = new();
     }
 
     public class ModuleDisplay
@@ -40,7 +41,9 @@ namespace Maui.Canvas.ViewModels
         {
             Course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == courseId);
             if (Course == null) return;
+
             Announcements = Course.Announcements.ToList();
+
             Assignments = Course.Assignments.Select(a =>
             {
                 var sub = a.Submissions
@@ -55,7 +58,8 @@ namespace Maui.Canvas.ViewModels
                     Info = $"{a.AvailablePoints} pts \u2022 due {a.DueDate:MM/dd/yyyy}",
                     GradeText = grade,
                     IsQuiz = a.IsQuiz,
-                    Question = a.Question
+                    Question = a.Question,
+                    CommentLines = a.Comments.Select(x => $"{x.Author}: {x.Text}").ToList()
                 };
             }).ToList();
 
@@ -95,6 +99,7 @@ namespace Maui.Canvas.ViewModels
                 GradePercentText = "No graded work yet";
             }
         }
+
         private string ToLetter(double pct)
         {
             if (Course == null) return "F";
@@ -104,6 +109,5 @@ namespace Maui.Canvas.ViewModels
             if (pct >= Course.GradeD) return "D";
             return "F";
         }
-        
     }
 }

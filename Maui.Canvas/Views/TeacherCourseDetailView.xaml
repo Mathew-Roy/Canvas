@@ -79,6 +79,14 @@
                                     <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" />
                                     <Label Text="{Binding AvailablePoints, StringFormat='{0} pts'}" FontSize="13" />
                                     <Label Text="{Binding DueDate, StringFormat='Due {0:MM/dd/yyyy}'}" FontSize="12" />
+                                    <VerticalStackLayout BindableLayout.ItemsSource="{Binding Comments}">
+                                    <BindableLayout.ItemTemplate>
+                                        <DataTemplate>
+                                            <Label Text="{Binding Display}" FontSize="12" />
+                                        </DataTemplate>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
+                                <Button Text="Comment" FontSize="12" Clicked="OnAddTeacherComment" />
                                 </VerticalStackLayout>
                                 <Button Grid.Column="1" Text="Edit" Clicked="OnEditAssignment" />
                                 <Button Grid.Column="2" Text="Delete" Clicked="OnDeleteAssignment" />
