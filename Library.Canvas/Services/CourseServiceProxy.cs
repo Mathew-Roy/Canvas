@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Library.Canvas.Models;
+using Library.Canvas.Database;
 
 namespace Library.Canvas.Services
 {
@@ -9,18 +13,28 @@ namespace Library.Canvas.Services
 
         private CourseServiceProxy()
         {
-            Courses = new List<Course>
+            Courses = CanvasDbContext.Current.GetCourses();
+            if (Courses.Count == 0)
+            {
+                Courses = Seed();
+                CanvasDbContext.Current.SaveCourses(Courses);
+            }
+        }
+
+        private List<Course> Seed()
+        {
+            var courses = new List<Course>
             {
                 new Course { Id = 1, Code = "COP4870", Name = "Full Stack Development", Description = "Building full stack applications", Term = Term.Fall, Year = 2026, Section = "001" },
                 new Course { Id = 2, Code = "COP3330", Name = "Object Oriented Programming", Description = "OOP concepts in C++", Term = Term.Spring, Year = 2026, Section = "001" }
             };
 
-            // Add a demo student to the first course, along with an assignment and a module
+            // Demo data so the MAUI student views have something to show
             var demoStudent = StudentServiceProxy.Current.Students.FirstOrDefault();
             if (demoStudent != null)
             {
-                Courses[0].Roster.Add(demoStudent);
-                Courses[0].Announcements.Add("Welcome to the course! Your first assignment is due soon.");
+                courses[0].Roster.Add(demoStudent);
+                courses[0].Announcements.Add("Welcome to the course! Your first assignment is due soon.");
 
                 var essay = new Assignment
                 {
@@ -40,9 +54,9 @@ namespace Library.Canvas.Services
                     SubmissionDate = new DateTime(2026, 8, 15),
                     Grade = 92
                 });
-                Courses[0].Assignments.Add(essay);
+                courses[0].Assignments.Add(essay);
 
-                Courses[0].AssignmentGroups.Add(new AssignmentGroup
+                courses[0].AssignmentGroups.Add(new AssignmentGroup
                 {
                     Id = 1,
                     Name = "Essays",
@@ -51,11 +65,13 @@ namespace Library.Canvas.Services
 
                 var demoModule = new Module { Id = 1 };
                 demoModule.Content.Add(new PageItem { Content = "Welcome to Full Stack Development!" });
-                Courses[0].Modules.Add(demoModule);
-
-
+                courses[0].Modules.Add(demoModule);
             }
+
+            return courses;
         }
+
+        public void Save() => CanvasDbContext.Current.SaveCourses(Courses);
 
         public static CourseServiceProxy Current
         {
