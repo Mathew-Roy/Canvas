@@ -1,4 +1,5 @@
 ﻿namespace Maui.Canvas;
+using Library.Canvas.Services;
 
 public partial class App : Application
 {
@@ -8,7 +9,9 @@ public partial class App : Application
 	}
 
 	protected override Window CreateWindow(IActivationState? activationState)
-	{
-		return new Window(new AppShell());
-	}
+    {
+        var window = new Window(new AppShell());
+        window.Destroying += (s, e) => StudentServiceProxy.Current.Save();
+        return window;
+    }
 }
