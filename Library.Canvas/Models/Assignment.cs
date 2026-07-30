@@ -12,5 +12,6 @@ namespace Library.Canvas.Models
         public bool IsQuiz { get; set; }
         public string? Question { get; set; }
         public List<Comment> Comments { get; set; } = new List<Comment>();
+        public List<string> Choices { get; set; } = new List<string>();
     }
 }

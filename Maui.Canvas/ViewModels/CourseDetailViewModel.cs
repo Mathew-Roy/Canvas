@@ -18,6 +18,9 @@ namespace Maui.Canvas.ViewModels
         public bool IsQuiz { get; set; }
         public string? Question { get; set; }
         public List<string> CommentLines { get; set; } = new();
+        public List<string> Choices { get; set; } = new();
+        public bool IsMultipleChoice => IsQuiz && Choices.Count > 0;
+        public bool IsFreeResponse => !IsMultipleChoice;
     }
 
     public class ModuleDisplay
@@ -31,8 +34,8 @@ namespace Maui.Canvas.ViewModels
         public Course? Course { get; private set; }
         public string CourseTitle => Course != null ? $"{Course.Name} ({Course.Code})" : "Course";
         public string LetterGrade { get; private set; } = "N/A";
-        public string LetterColor { get; private set; } = "#FFFFFF";
         public string GradePercentText { get; private set; } = "";
+        public string LetterColor { get; private set; } = "#FFFFFF";
         public List<AssignmentDisplay> Assignments { get; private set; } = new();
         public List<ModuleDisplay> Modules { get; private set; } = new();
         public List<string> Announcements { get; private set; } = new();
@@ -47,11 +50,8 @@ namespace Maui.Canvas.ViewModels
 
             Assignments = Course.Assignments.Select(a =>
             {
-                var sub = a.Submissions
-                    .FirstOrDefault(s => s.StudentId == studentId && s.Grade.HasValue);
-                string grade = sub != null
-                    ? $"Your grade: {sub.Grade}/{a.AvailablePoints}"
-                    : "Not graded";
+                var sub = a.Submissions.FirstOrDefault(s => s.StudentId == studentId && s.Grade.HasValue);
+                string grade = sub != null ? $"Your grade: {sub.Grade}/{a.AvailablePoints}" : "Not graded";
                 return new AssignmentDisplay
                 {
                     AssignmentId = a.Id,
@@ -60,7 +60,8 @@ namespace Maui.Canvas.ViewModels
                     GradeText = grade,
                     IsQuiz = a.IsQuiz,
                     Question = a.Question,
-                    CommentLines = a.Comments.Select(x => $"{x.Author}: {x.Text}").ToList()
+                    CommentLines = a.Comments.Select(x => $"{x.Author}: {x.Text}").ToList(),
+                    Choices = a.Choices
                 };
             }).ToList();
 
@@ -77,8 +78,7 @@ namespace Maui.Canvas.ViewModels
                 var percents = new List<double>();
                 foreach (var a in Course.Assignments.Where(a => a.GroupId == group.Id))
                 {
-                    var sub = a.Submissions
-                        .FirstOrDefault(s => s.StudentId == studentId && s.Grade.HasValue);
+                    var sub = a.Submissions.FirstOrDefault(s => s.StudentId == studentId && s.Grade.HasValue);
                     if (sub != null && a.AvailablePoints > 0)
                     {
                         percents.Add(sub.Grade!.Value / a.AvailablePoints * 100.0);
@@ -99,7 +99,7 @@ namespace Maui.Canvas.ViewModels
                 LetterGrade = "N/A";
                 GradePercentText = "No graded work yet";
             }
-            
+
             LetterColor = LetterGrade switch
             {
                 "A" => Course.ColorA,
@@ -120,8 +120,5 @@ namespace Maui.Canvas.ViewModels
             if (pct >= Course.GradeD) return "D";
             return "F";
         }
-
-        
     }
-    
 }

@@ -14,15 +14,8 @@ public partial class CourseDetailView : ContentPage
     private int _courseId;
     private int _studentId;
 
-    public string CourseId
-    {
-        set { int.TryParse(value, out _courseId); TryLoad(); }
-    }
-
-    public string StudentId
-    {
-        set { int.TryParse(value, out _studentId); TryLoad(); }
-    }
+    public string CourseId { set { int.TryParse(value, out _courseId); TryLoad(); } }
+    public string StudentId { set { int.TryParse(value, out _studentId); TryLoad(); } }
 
     public CourseDetailView()
     {
@@ -39,9 +32,28 @@ public partial class CourseDetailView : ContentPage
         }
     }
 
-    private async void OnBackClicked(object sender, EventArgs e)
+    private void OnChoiceSelected(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("..");
+        if (sender is Picker picker
+            && picker.BindingContext is AssignmentDisplay display
+            && picker.SelectedItem is string choice)
+        {
+            display.ResponseText = choice;
+        }
+    }
+
+    private async void OnAttachFile(object sender, EventArgs e)
+    {
+        if (((Button)sender).BindingContext is AssignmentDisplay display)
+        {
+            var result = await FilePicker.Default.PickAsync();
+            if (result != null)
+            {
+                display.AttachedFileName = result.FileName;
+                display.AttachedFilePath = result.FullPath;
+                await DisplayAlert("File Attached", $"Attached: {result.FileName}", "OK");
+            }
+        }
     }
 
     private async void OnSubmitResponse(object sender, EventArgs e)
@@ -55,10 +67,8 @@ public partial class CourseDetailView : ContentPage
                 return;
             }
 
-            var course = CourseServiceProxy.Current.Courses
-                .FirstOrDefault(c => c.Id == _courseId);
-            var assignment = course?.Assignments
-                .FirstOrDefault(a => a.Id == display.AssignmentId);
+            var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
+            var assignment = course?.Assignments.FirstOrDefault(a => a.Id == display.AssignmentId);
 
             if (assignment != null)
             {
@@ -80,23 +90,7 @@ public partial class CourseDetailView : ContentPage
             }
         }
     }
-    private async void OnMainMenuClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("//MainPage");
-    }
-    private async void OnAttachFile(object sender, EventArgs e)
-    {
-        if (((Button)sender).BindingContext is AssignmentDisplay display)
-        {
-            var result = await FilePicker.Default.PickAsync();
-            if (result != null)
-            {
-                display.AttachedFileName = result.FileName;
-                display.AttachedFilePath = result.FullPath;
-                await DisplayAlert("File Attached", $"Attached: {result.FileName}", "OK");
-            }
-        }
-    }
+
     private async void OnAddComment(object sender, EventArgs e)
     {
         if (((Button)sender).BindingContext is AssignmentDisplay display)
@@ -115,8 +109,18 @@ public partial class CourseDetailView : ContentPage
                     Text = text,
                     PostedAt = DateTime.Now
                 });
-                TryLoad();   // refresh the page so the new comment shows
+                TryLoad();
             }
         }
+    }
+
+    private async void OnBackClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("..");
+    }
+
+    private async void OnMainMenuClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("//MainPage");
     }
 }
