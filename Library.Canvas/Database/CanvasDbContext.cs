@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Data.SqlClient;
 using Library.Canvas.Models;
-using System.Linq;
 using Library.Canvas.Services;
 
 namespace Library.Canvas.Database
@@ -60,6 +60,7 @@ namespace Library.Canvas.Database
             tx.Commit();
         }
 
+        // ---------- Courses ----------
         public List<Course> GetCourses()
         {
             var courses = new List<Course>();
@@ -67,7 +68,7 @@ namespace Library.Canvas.Database
             conn.Open();
 
             using (var cmd = new SqlCommand(
-                "SELECT Id, Code, Name, Description, Term, Year, Section, GradeA, GradeB, GradeC, GradeD FROM Courses", conn))
+                "SELECT Id, Code, Name, Description, Term, Year, Section, GradeA, GradeB, GradeC, GradeD, ColorA, ColorB, ColorC, ColorD, ColorF FROM Courses", conn))
             using (var reader = cmd.ExecuteReader())
             {
                 while (reader.Read())
@@ -84,7 +85,12 @@ namespace Library.Canvas.Database
                         GradeA = reader.GetInt32(7),
                         GradeB = reader.GetInt32(8),
                         GradeC = reader.GetInt32(9),
-                        GradeD = reader.GetInt32(10)
+                        GradeD = reader.GetInt32(10),
+                        ColorA = reader.IsDBNull(11) ? "#2E7D32" : reader.GetString(11),
+                        ColorB = reader.IsDBNull(12) ? "#1565C0" : reader.GetString(12),
+                        ColorC = reader.IsDBNull(13) ? "#F9A825" : reader.GetString(13),
+                        ColorD = reader.IsDBNull(14) ? "#EF6C00" : reader.GetString(14),
+                        ColorF = reader.IsDBNull(15) ? "#C62828" : reader.GetString(15)
                     });
                 }
             }
@@ -214,8 +220,8 @@ namespace Library.Canvas.Database
             foreach (var c in courses)
             {
                 using (var ins = new SqlCommand(
-                    @"INSERT INTO Courses (Id, Code, Name, Description, Term, Year, Section, GradeA, GradeB, GradeC, GradeD)
-                      VALUES (@id,@code,@name,@desc,@term,@year,@section,@ga,@gb,@gc,@gd)", conn, tx))
+                    @"INSERT INTO Courses (Id, Code, Name, Description, Term, Year, Section, GradeA, GradeB, GradeC, GradeD, ColorA, ColorB, ColorC, ColorD, ColorF)
+                      VALUES (@id,@code,@name,@desc,@term,@year,@section,@ga,@gb,@gc,@gd,@ca,@cb,@cc,@cd,@cf)", conn, tx))
                 {
                     ins.Parameters.AddWithValue("@id", c.Id);
                     ins.Parameters.AddWithValue("@code", (object?)c.Code ?? DBNull.Value);
@@ -228,6 +234,11 @@ namespace Library.Canvas.Database
                     ins.Parameters.AddWithValue("@gb", c.GradeB);
                     ins.Parameters.AddWithValue("@gc", c.GradeC);
                     ins.Parameters.AddWithValue("@gd", c.GradeD);
+                    ins.Parameters.AddWithValue("@ca", (object?)c.ColorA ?? DBNull.Value);
+                    ins.Parameters.AddWithValue("@cb", (object?)c.ColorB ?? DBNull.Value);
+                    ins.Parameters.AddWithValue("@cc", (object?)c.ColorC ?? DBNull.Value);
+                    ins.Parameters.AddWithValue("@cd", (object?)c.ColorD ?? DBNull.Value);
+                    ins.Parameters.AddWithValue("@cf", (object?)c.ColorF ?? DBNull.Value);
                     ins.ExecuteNonQuery();
                 }
 
