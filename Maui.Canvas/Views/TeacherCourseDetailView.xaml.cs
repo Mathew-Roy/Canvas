@@ -74,6 +74,10 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
 
         string question = NewAssignmentQuestion.Text;
 
+        var choices = string.IsNullOrWhiteSpace(NewAssignmentChoices.Text)
+            ? new List<string>()
+            : NewAssignmentChoices.Text.Split(',').Select(x => x.Trim()).Where(x => x != "").ToList();
+
         course.Assignments.Add(new Assignment
         {
             Id = newId,
@@ -81,12 +85,14 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
             AvailablePoints = points,
             DueDate = NewAssignmentDue.Date,
             IsQuiz = !string.IsNullOrWhiteSpace(question),
-            Question = question
+            Question = question,
+            Choices = choices
         });
 
         NewAssignmentName.Text = string.Empty;
         NewAssignmentPoints.Text = string.Empty;
         NewAssignmentQuestion.Text = string.Empty;
+        NewAssignmentChoices.Text = string.Empty;
         Reload();
     }
 

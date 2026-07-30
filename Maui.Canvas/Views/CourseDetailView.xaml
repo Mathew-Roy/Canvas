@@ -7,9 +7,9 @@
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="20">
 
-            <Label Text="{Binding CourseTitle}" FontSize="26" FontAttributes="Bold"
-                   HorizontalOptions="Center" />
-                   <Frame BackgroundColor="#5a2b2b" Padding="12" IsVisible="{Binding HasAnnouncements}">
+            <Label Text="{Binding CourseTitle}" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" />
+
+            <Frame BackgroundColor="#5a2b2b" Padding="12" IsVisible="{Binding HasAnnouncements}">
                 <VerticalStackLayout>
                     <Label Text="Announcements" FontSize="16" FontAttributes="Bold" TextColor="White" />
                     <VerticalStackLayout BindableLayout.ItemsSource="{Binding Announcements}">
@@ -21,14 +21,13 @@
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Frame>
-                   <Frame BackgroundColor="#2b3a55" Padding="15" Margin="0,0,0,10">
+
+            <Frame BackgroundColor="#2b3a55" Padding="15" Margin="0,0,0,10">
                 <VerticalStackLayout HorizontalOptions="Center">
-                    <Label Text="Current Grade" FontSize="14" TextColor="White"
-                           HorizontalOptions="Center" />
+                    <Label Text="Current Grade" FontSize="14" TextColor="White" HorizontalOptions="Center" />
                     <Label Text="{Binding LetterGrade}" FontSize="48" FontAttributes="Bold"
                            TextColor="{Binding LetterColor}" HorizontalOptions="Center" />
-                    <Label Text="{Binding GradePercentText}" FontSize="16" TextColor="White"
-                           HorizontalOptions="Center" />
+                    <Label Text="{Binding GradePercentText}" FontSize="16" TextColor="White" HorizontalOptions="Center" />
                 </VerticalStackLayout>
             </Frame>
 
@@ -42,15 +41,18 @@
                                 <Label Text="{Binding Info}" FontSize="13" />
                                 <Label Text="{Binding GradeText}" FontSize="13" TextColor="DarkGreen" />
                                 <Label Text="{Binding Question, StringFormat='Quiz: {0}'}"
-                                       IsVisible="{Binding IsQuiz}"
-                                       FontSize="14" FontAttributes="Italic" />
+                                       IsVisible="{Binding IsQuiz}" FontSize="14" FontAttributes="Italic" />
+                                <Picker Title="Select an answer"
+                                        ItemsSource="{Binding Choices}"
+                                        IsVisible="{Binding IsMultipleChoice}"
+                                        SelectedIndexChanged="OnChoiceSelected" />
                                 <Editor Placeholder="Type your response..."
                                         Text="{Binding ResponseText}"
-                                        HeightRequest="80" />
+                                        HeightRequest="80"
+                                        IsVisible="{Binding IsFreeResponse}" />
                                 <Button Text="Attach File" Clicked="OnAttachFile" />
-                                <Button Text="Submit Response"
-                                        Clicked="OnSubmitResponse" />
-                            <Label Text="Comments" FontSize="13" FontAttributes="Bold" />
+                                <Button Text="Submit Response" Clicked="OnSubmitResponse" />
+                                <Label Text="Comments" FontSize="13" FontAttributes="Bold" />
                                 <VerticalStackLayout BindableLayout.ItemsSource="{Binding CommentLines}">
                                     <BindableLayout.ItemTemplate>
                                         <DataTemplate>

@@ -21,8 +21,7 @@ namespace Library.Canvas.Database
             var students = new List<Student>();
             using var conn = new SqlConnection(ConnectionString);
             conn.Open();
-            using var cmd = new SqlCommand(
-                "SELECT Id, Name, Classification, Code FROM Students", conn);
+            using var cmd = new SqlCommand("SELECT Id, Name, Classification, Code FROM Students", conn);
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -49,8 +48,7 @@ namespace Library.Canvas.Database
             foreach (var s in students)
             {
                 using var ins = new SqlCommand(
-                    "INSERT INTO Students (Id, Name, Classification, Code) VALUES (@id, @name, @class, @code)",
-                    conn, tx);
+                    "INSERT INTO Students (Id, Name, Classification, Code) VALUES (@id, @name, @class, @code)", conn, tx);
                 ins.Parameters.AddWithValue("@id", s.Id);
                 ins.Parameters.AddWithValue("@name", (object?)s.Name ?? DBNull.Value);
                 ins.Parameters.AddWithValue("@class", (object?)s.Classification ?? DBNull.Value);
@@ -125,7 +123,7 @@ namespace Library.Canvas.Database
                 }
 
                 using (var cmd = new SqlCommand(
-                    "SELECT Id, Name, Description, AvailablePoints, DueDate, GroupId, IsQuiz, Question FROM Assignments WHERE CourseId=@cid", conn))
+                    "SELECT Id, Name, Description, AvailablePoints, DueDate, GroupId, IsQuiz, Question, Choices FROM Assignments WHERE CourseId=@cid", conn))
                 {
                     cmd.Parameters.AddWithValue("@cid", course.Id);
                     using var r = cmd.ExecuteReader();
@@ -139,7 +137,8 @@ namespace Library.Canvas.Database
                             DueDate = r.GetDateTime(4),
                             GroupId = r.IsDBNull(5) ? (int?)null : r.GetInt32(5),
                             IsQuiz = r.GetBoolean(6),
-                            Question = r.IsDBNull(7) ? null : r.GetString(7)
+                            Question = r.IsDBNull(7) ? null : r.GetString(7),
+                            Choices = r.IsDBNull(8) ? new List<string>() : r.GetString(8).Split('|', StringSplitOptions.RemoveEmptyEntries).ToList()
                         });
                 }
 
@@ -259,8 +258,8 @@ namespace Library.Canvas.Database
                 foreach (var a in c.Assignments)
                 {
                     using (var ins = new SqlCommand(
-                        @"INSERT INTO Assignments (Id, CourseId, Name, Description, AvailablePoints, DueDate, GroupId, IsQuiz, Question)
-                          VALUES (@id,@cid,@name,@desc,@pts,@due,@gid,@quiz,@q)", conn, tx))
+                        @"INSERT INTO Assignments (Id, CourseId, Name, Description, AvailablePoints, DueDate, GroupId, IsQuiz, Question, Choices)
+                          VALUES (@id,@cid,@name,@desc,@pts,@due,@gid,@quiz,@q,@choices)", conn, tx))
                     {
                         ins.Parameters.AddWithValue("@id", a.Id);
                         ins.Parameters.AddWithValue("@cid", c.Id);
@@ -271,6 +270,7 @@ namespace Library.Canvas.Database
                         ins.Parameters.AddWithValue("@gid", (object?)a.GroupId ?? DBNull.Value);
                         ins.Parameters.AddWithValue("@quiz", a.IsQuiz);
                         ins.Parameters.AddWithValue("@q", (object?)a.Question ?? DBNull.Value);
+                        ins.Parameters.AddWithValue("@choices", a.Choices != null && a.Choices.Count > 0 ? (object)string.Join("|", a.Choices) : DBNull.Value);
                         ins.ExecuteNonQuery();
                     }
 
