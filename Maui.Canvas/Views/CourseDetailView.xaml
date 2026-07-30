@@ -26,7 +26,7 @@
                     <Label Text="Current Grade" FontSize="14" TextColor="White"
                            HorizontalOptions="Center" />
                     <Label Text="{Binding LetterGrade}" FontSize="48" FontAttributes="Bold"
-                           TextColor="White" HorizontalOptions="Center" />
+                           TextColor="{Binding LetterColor}" HorizontalOptions="Center" />
                     <Label Text="{Binding GradePercentText}" FontSize="16" TextColor="White"
                            HorizontalOptions="Center" />
                 </VerticalStackLayout>

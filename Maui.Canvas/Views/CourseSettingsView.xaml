@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Maui.Canvas.Views.CourseSettingsView"
              Title="Course Settings">
-
-    <VerticalStackLayout Spacing="15" Padding="20">
+    <ScrollView>
+        <VerticalStackLayout Spacing="15" Padding="20">
 
         <Label Text="Letter Grade Ranges" FontSize="24" FontAttributes="Bold"
                HorizontalOptions="Center" />
@@ -22,8 +22,25 @@
             <Entry Grid.Row="3" Grid.Column="1" x:Name="EntryD" Keyboard="Numeric" />
         </Grid>
 
+        <Label Text="Letter Grade Colors (hex)" FontSize="16" FontAttributes="Bold" />
+        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto"
+              ColumnSpacing="10" RowSpacing="8">
+            <Label Grid.Row="0" Grid.Column="0" Text="A" VerticalOptions="Center" />
+            <Entry Grid.Row="0" Grid.Column="1" x:Name="ColorAEntry" Placeholder="#2E7D32" />
+            <Label Grid.Row="1" Grid.Column="0" Text="B" VerticalOptions="Center" />
+            <Entry Grid.Row="1" Grid.Column="1" x:Name="ColorBEntry" />
+            <Label Grid.Row="2" Grid.Column="0" Text="C" VerticalOptions="Center" />
+            <Entry Grid.Row="2" Grid.Column="1" x:Name="ColorCEntry" />
+            <Label Grid.Row="3" Grid.Column="0" Text="D" VerticalOptions="Center" />
+            <Entry Grid.Row="3" Grid.Column="1" x:Name="ColorDEntry" />
+            <Label Grid.Row="4" Grid.Column="0" Text="F" VerticalOptions="Center" />
+            <Entry Grid.Row="4" Grid.Column="1" x:Name="ColorFEntry" />
+        </Grid>
+
+
         <Button Text="Save" Clicked="OnSave" />
         <Button Text="Back" Clicked="OnBackClicked" />
 
-    </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

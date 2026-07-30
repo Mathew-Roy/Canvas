@@ -31,6 +31,7 @@ namespace Maui.Canvas.ViewModels
         public Course? Course { get; private set; }
         public string CourseTitle => Course != null ? $"{Course.Name} ({Course.Code})" : "Course";
         public string LetterGrade { get; private set; } = "N/A";
+        public string LetterColor { get; private set; } = "#FFFFFF";
         public string GradePercentText { get; private set; } = "";
         public List<AssignmentDisplay> Assignments { get; private set; } = new();
         public List<ModuleDisplay> Modules { get; private set; } = new();
@@ -98,6 +99,16 @@ namespace Maui.Canvas.ViewModels
                 LetterGrade = "N/A";
                 GradePercentText = "No graded work yet";
             }
+            
+            LetterColor = LetterGrade switch
+            {
+                "A" => Course.ColorA,
+                "B" => Course.ColorB,
+                "C" => Course.ColorC,
+                "D" => Course.ColorD,
+                "F" => Course.ColorF,
+                _ => "#FFFFFF"
+            };
         }
 
         private string ToLetter(double pct)
@@ -109,5 +120,8 @@ namespace Maui.Canvas.ViewModels
             if (pct >= Course.GradeD) return "D";
             return "F";
         }
+
+        
     }
+    
 }
