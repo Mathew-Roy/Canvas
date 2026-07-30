@@ -61,7 +61,7 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
         }
     }
 
-    private void OnAddAssignment(object sender, EventArgs e)
+    private async void OnAddAssignment(object sender, EventArgs e)
     {
         var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
         if (course == null) return;
@@ -94,6 +94,14 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
         NewAssignmentQuestion.Text = string.Empty;
         NewAssignmentChoices.Text = string.Empty;
         Reload();
+
+        // #55 - notify (simulate emailing) enrolled students about the new assignment
+        if (course.Roster.Any())
+        {
+            string names = string.Join(", ", course.Roster.Select(s => s.Name));
+            await DisplayAlert("Students Notified",
+                $"Emailed {course.Roster.Count} student(s) about the new assignment '{name}':\n{names}", "OK");
+        }
     }
 
     private void OnDeleteAssignment(object sender, EventArgs e)
