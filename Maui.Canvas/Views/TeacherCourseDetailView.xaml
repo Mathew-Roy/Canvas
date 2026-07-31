@@ -7,8 +7,9 @@
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="20">
 
-            <Label Text="{Binding CourseTitle}" FontSize="26" FontAttributes="Bold"
-                   HorizontalOptions="Center" />
+            <Label Text="{Binding CourseTitle}" 
+                FontSize="26" Style="{StaticResource Heading}" 
+                HorizontalOptions="Center" />
             <Button Text="Course Settings" Clicked="OnCourseSettings" />
 
             <Label Text="Announcements" FontSize="20" FontAttributes="Bold" />

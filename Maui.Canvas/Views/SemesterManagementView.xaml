@@ -7,7 +7,8 @@
     <ScrollView>
         <VerticalStackLayout Spacing="15" Padding="20">
 
-            <Label Text="Semester Dates" FontSize="26" FontAttributes="Bold"
+            <Label Text="Semester Dates"
+                   FontSize="26" Style="{StaticResource Heading}"
                    HorizontalOptions="Center" />
 
             <CollectionView ItemsSource="{Binding Semesters}">

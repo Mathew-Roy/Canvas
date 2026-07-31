@@ -5,9 +5,9 @@
 
     <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
 
-        <Label Text="{Binding Title}"
-               FontSize="40"
-               HorizontalOptions="Center" />
+        <Label Text="{Binding Title}" 
+              FontSize="40" Style="{StaticResource Heading}" 
+              HorizontalOptions="Center" />
 
         <Label Text="Welcome! How will you use the app?"
                FontSize="18"

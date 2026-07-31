@@ -1,4 +1,4 @@
-﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Maui.Canvas"
@@ -9,6 +9,49 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- FSU / Canvas theme -->
+            <Color x:Key="Garnet">#782F40</Color>
+            <Color x:Key="CanvasGrey">#4A4A4A</Color>
+
+            <!-- White page backgrounds everywhere -->
+            <Style TargetType="Page" ApplyToDerivedTypes="True">
+                <Setter Property="BackgroundColor" Value="White" />
+            </Style>
+
+            <!-- Body text + points: grey -->
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource CanvasGrey}" />
+            </Style>
+
+            <!-- Buttons: garnet background, white bold text -->
+            <Style TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{StaticResource Garnet}" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="6" />
+            </Style>
+
+            <!-- Top nav bar: garnet with white title -->
+            <Style TargetType="Shell" ApplyToDerivedTypes="True">
+                <Setter Property="Shell.BackgroundColor" Value="{StaticResource Garnet}" />
+                <Setter Property="Shell.ForegroundColor" Value="White" />
+                <Setter Property="Shell.TitleColor" Value="White" />
+            </Style>
+
+            <!-- Apply this to headings to make them garnet -->
+            <Style x:Key="Heading" TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource Garnet}" />
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+
+            <!-- Cards / boxes: white with a soft border -->
+            <Style TargetType="Frame">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="BorderColor" Value="#D0D0D0" />
+                <Setter Property="HasShadow" Value="False" />
+            </Style>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

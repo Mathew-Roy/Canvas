@@ -7,7 +7,9 @@
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="20">
 
-            <Label Text="{Binding CourseTitle}" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" />
+            <Label Text="{Binding CourseTitle}" 
+                FontSize="26" Style="{StaticResource Heading}" 
+                HorizontalOptions="Center" />
 
             <Frame BackgroundColor="#5a2b2b" Padding="12" IsVisible="{Binding HasAnnouncements}">
                 <VerticalStackLayout>
