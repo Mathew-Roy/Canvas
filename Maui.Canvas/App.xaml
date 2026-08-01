@@ -63,6 +63,7 @@
             </Style>
             <Style TargetType="Picker">
                 <Setter Property="TextColor" Value="{StaticResource CanvasGrey}" />
+                <Setter Property="TitleColor" Value="#999999" />
             </Style>
             <Style TargetType="DatePicker">
                 <Setter Property="TextColor" Value="{StaticResource CanvasGrey}" />
