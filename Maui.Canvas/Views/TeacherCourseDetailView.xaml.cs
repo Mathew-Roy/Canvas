@@ -22,12 +22,12 @@ public partial class TeacherCourseDetailView : ContentPage
         InitializeComponent();
     }
 
-private void OnRosterSearch(object sender, TextChangedEventArgs e)
+    private void OnRosterSearch(object sender, TextChangedEventArgs e)
     {
         _searchText = e.NewTextValue ?? "";
         Reload();
     }
-    
+
     private void Reload()
     {
         if (_courseId > 0)
@@ -95,7 +95,6 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
         NewAssignmentChoices.Text = string.Empty;
         Reload();
 
-        // #55 - notify (simulate emailing) enrolled students about the new assignment
         if (course.Roster.Any())
         {
             string names = string.Join(", ", course.Roster.Select(s => s.Name));
@@ -112,7 +111,7 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
             var target = course?.Assignments.FirstOrDefault(a => a.Id == assignment.Id);
             if (target != null)
             {
-                target.Submissions.Clear();          // cascade: delete its submissions
+                target.Submissions.Clear();
                 course!.Assignments.Remove(target);
             }
             Reload();
@@ -216,6 +215,7 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
             Reload();
         }
     }
+
     private void OnCopyAssignments(object sender, EventArgs e)
     {
         if (SourceCoursePicker.SelectedItem is not Course source) return;
@@ -234,12 +234,12 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
                 AvailablePoints = a.AvailablePoints,
                 DueDate = a.DueDate,
                 GroupId = a.GroupId
-                // Submissions intentionally NOT copied
             });
         }
 
         Reload();
     }
+
     private async void OnExportRoster(object sender, EventArgs e)
     {
         var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
@@ -270,8 +270,6 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
         {
             var parts = line.Split(',');
             if (parts.Length < 1 || !int.TryParse(parts[0], out int id)) continue;
-
-            // idempotent + non-destructive: only add students not already enrolled
             if (course.Roster.Any(s => s.Id == id)) continue;
 
             var student = StudentServiceProxy.Current.Students.FirstOrDefault(s => s.Id == id);
@@ -285,6 +283,7 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
         await DisplayAlert("Imported", $"Added {added} new student(s).", "OK");
         Reload();
     }
+
     private void OnPostAnnouncement(object sender, EventArgs e)
     {
         var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
@@ -307,42 +306,40 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
             Reload();
         }
     }
+
     private async void OnMainMenuClicked(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync("//MainPage");
     }
+
     private async void OnExportGradebook(object sender, EventArgs e)
     {
         var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
         if (course == null) return;
 
         var sb = new System.Text.StringBuilder();
-
-        // Header row: Student, then one column per assignment
         sb.Append("Student");
         foreach (var a in course.Assignments)
             sb.Append($",{a.Name}");
         sb.AppendLine();
 
-        // One row per student, with their grade in each assignment column
         foreach (var student in course.Roster)
         {
             sb.Append(student.Name);
             foreach (var a in course.Assignments)
             {
-                var sub = a.Submissions
-                    .FirstOrDefault(s => s.StudentId == student.Id && s.Grade.HasValue);
+                var sub = a.Submissions.FirstOrDefault(s => s.StudentId == student.Id && s.Grade.HasValue);
                 sb.Append($",{(sub != null ? sub.Grade.ToString() : "")}");
             }
             sb.AppendLine();
         }
 
-        string path = System.IO.Path.Combine(FileSystem.AppDataDirectory,
-            $"gradebook_course{course.Id}.csv");
+        string path = System.IO.Path.Combine(FileSystem.AppDataDirectory, $"gradebook_course{course.Id}.csv");
         System.IO.File.WriteAllText(path, sb.ToString());
 
         await DisplayAlert("Gradebook Exported", $"Saved to:\n{path}", "OK");
     }
+
     private async void OnExportAssignments(object sender, EventArgs e)
     {
         var course = CourseServiceProxy.Current.Courses.FirstOrDefault(c => c.Id == _courseId);
@@ -377,8 +374,6 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
 
             string name = parts[0];
             if (string.IsNullOrWhiteSpace(name)) continue;
-
-            // non-destructive: skip if this course already has an assignment with that name
             if (course.Assignments.Any(a => a.Name == name)) continue;
 
             int.TryParse(parts[2], out int pts);
@@ -401,10 +396,22 @@ private void OnRosterSearch(object sender, TextChangedEventArgs e)
         await DisplayAlert("Imported", $"Added {added} assignment(s).", "OK");
         Reload();
     }
+
     private async void OnCourseSettings(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync($"coursesettings?courseId={_courseId}");
     }
+
+    private async void OnManageGroups(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync($"assignmentgroups?courseId={_courseId}");
+    }
+
+    private async void OnGradeSubmissions(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync($"gradesubmissions?courseId={_courseId}");
+    }
+
     private async void OnAddTeacherComment(object sender, EventArgs e)
     {
         if (((Button)sender).BindingContext is Assignment assignment)

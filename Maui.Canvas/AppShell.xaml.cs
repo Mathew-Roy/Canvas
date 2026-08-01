@@ -11,6 +11,8 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("student", typeof(StudentView));
         Routing.RegisterRoute("studentcourses", typeof(StudentCoursesView));
         Routing.RegisterRoute("coursedetail", typeof(CourseDetailView));
+        Routing.RegisterRoute("assignmentgroups", typeof(AssignmentGroupsView));
+        Routing.RegisterRoute("gradesubmissions", typeof(GradeSubmissionsView));
         Routing.RegisterRoute("teachercourse", typeof(TeacherCourseDetailView));
         Routing.RegisterRoute("managestudents", typeof(StudentManagementView));
         Routing.RegisterRoute("coursesettings", typeof(CourseSettingsView));

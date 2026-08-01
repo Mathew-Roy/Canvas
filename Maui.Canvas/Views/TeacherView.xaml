@@ -6,6 +6,7 @@
 
     <VerticalStackLayout Spacing="15" Padding="20">
 
+
         <Label Text="Select a Course" 
             FontSize="28" Style="{StaticResource Heading}" 
             HorizontalOptions="Center" />

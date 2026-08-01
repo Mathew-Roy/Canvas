@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Maui.Canvas.Views.AssignmentGroupsView"
+             Title="Assignment Groups">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="15" Padding="20">
+
+            <Label Text="{Binding CourseTitle}" FontSize="26" Style="{StaticResource Heading}"
+                   HorizontalOptions="Center" />
+
+            <Label Text="Groups" FontSize="20" FontAttributes="Bold" />
+            <CollectionView ItemsSource="{Binding Groups}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="Gray" Padding="12" Margin="0,4">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" />
+                                <Entry Text="{Binding WeightText}" Placeholder="Weight %" Keyboard="Numeric" />
+                                <Button Text="Save Weight" Clicked="OnSaveWeight" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="Add a Group" FontSize="18" FontAttributes="Bold" />
+            <Entry x:Name="NewGroupName" Placeholder="Group name (e.g. Homework)" />
+            <Button Text="Add Group" Clicked="OnAddGroup" />
+
+            <Label Text="Assign an Assignment to a Group" FontSize="18" FontAttributes="Bold" />
+            <Picker x:Name="AssignmentPicker" Title="Select assignment"
+                    ItemsSource="{Binding Assignments}" ItemDisplayBinding="{Binding Name}" />
+            <Picker x:Name="GroupPicker" Title="Select group"
+                    ItemsSource="{Binding Groups}" ItemDisplayBinding="{Binding Name}" />
+            <Button Text="Assign" Clicked="OnAssign" />
+
+            <Button Text="Back" Clicked="OnBackClicked" />
+            <Button Text="Main Menu" Clicked="OnMainMenuClicked" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

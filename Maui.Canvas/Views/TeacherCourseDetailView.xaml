@@ -12,6 +12,10 @@
                 HorizontalOptions="Center" />
             <Button Text="Course Settings" Clicked="OnCourseSettings" />
 
+            <Button Text="Manage Assignment Groups" Clicked="OnManageGroups" />
+            
+            <Button Text="Grade Submissions" Clicked="OnGradeSubmissions" />
+
             <Label Text="Announcements" FontSize="20" FontAttributes="Bold" />
             <CollectionView ItemsSource="{Binding Announcements}">
                 <CollectionView.ItemTemplate>
